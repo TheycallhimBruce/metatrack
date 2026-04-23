@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_6.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_7.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -150,6 +150,7 @@ canvas{width:100%;height:200px}
   <div class="sb-sec">
     <div class="sb-lbl">Insights</div>
     <div class="nav" onclick="showPage(&#39;analytics&#39;)"><span class="nav-ic">📊</span> Analytics</div>
+    <div class="nav" onclick="showPage(&#39;claude&#39;)"><span class="nav-ic">🤖</span> Ask Claude</div>
     <div class="nav" onclick="showPage(&#39;settings&#39;)"><span class="nav-ic">⚙️</span> Settings</div>
   </div>
   <div class="sb-bot">
@@ -419,6 +420,65 @@ canvas{width:100%;height:200px}
 
 </div><!-- /main -->
 
+<!-- CLAUDE -->
+<div class="page" id="page-claude">
+  <div class="pw">
+    <div class="ph">
+      <div class="ph-l">
+        <div class="pt">Ask Claude</div>
+        <div class="ps">Generate prompts from your real data</div>
+      </div>
+    </div>
+
+    <!-- RECIPE CARD -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="ch"><span class="ct">🍳 Recipe Suggestions</span></div>
+      <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Generates a prompt based on what you currently have in your pantry, your calorie goal and budget. Paste it into Claude for recipe ideas.</p>
+      <div class="fgrid fc2" style="margin-bottom:14px">
+        <div class="frow">
+          <label>Max calories per serve</label>
+          <input type="number" id="recipe-cals" placeholder="600" value="600">
+        </div>
+        <div class="frow">
+          <label>Number of recipes</label>
+          <select id="recipe-count">
+            <option value="3">3 recipes</option>
+            <option value="5" selected="">5 recipes</option>
+            <option value="10">10 recipes</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <label>Any preferences for tonight?</label>
+        <input type="text" id="recipe-pref" placeholder="e.g. quick meal, high protein, using chicken...">
+      </div>
+      <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px" onclick="generateRecipePrompt()">Generate Recipe Prompt</button>
+      <div id="recipe-prompt-area" style="display:none">
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy this and paste it into Claude:</div>
+        <textarea id="recipe-prompt-text" rows="10" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical" readonly=""></textarea>
+        <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;recipe-prompt-text&#39;)">📋 Copy to Clipboard</button>
+      </div>
+    </div>
+
+    <!-- HEALTH ANALYSIS CARD -->
+    <div class="card">
+      <div class="ch"><span class="ct">📈 Health Analysis</span></div>
+      <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Packages your last 7 days of food, exercise and weight data into a prompt for Claude to analyse your progress and patterns.</p>
+      <div class="frow">
+        <label>Anything specific you want Claude to focus on?</label>
+        <input type="text" id="analysis-focus" placeholder="e.g. am I hitting protein goals? how is my calorie burn tracking?">
+      </div>
+      <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px" onclick="generateAnalysisPrompt()">Generate Analysis Prompt</button>
+      <div id="analysis-prompt-area" style="display:none">
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy this and paste it into Claude:</div>
+        <textarea id="analysis-prompt-text" rows="12" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical" readonly=""></textarea>
+        <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;analysis-prompt-text&#39;)">📋 Copy to Clipboard</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- MOBILE NAV -->
 <nav id="mobile-nav">
   <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
@@ -429,6 +489,7 @@ canvas{width:100%;height:200px}
   <div class="mob-nav" onclick="startSession()" style="color:var(--ok)"><span class="nav-ic">🚶</span>Walk</div>
   <div class="mob-nav" id="mob-body" onclick="showPage(&#39;body&#39;)"><span class="nav-ic">⚖️</span>Body</div>
   <div class="mob-nav" id="mob-analytics" onclick="showPage(&#39;analytics&#39;)"><span class="nav-ic">📊</span>Stats</div>
+  <div class="mob-nav" id="mob-claude" onclick="showPage(&#39;claude&#39;)"><span class="nav-ic">🤖</span>Claude</div>
   <div class="mob-nav" id="mob-settings" onclick="showPage(&#39;settings&#39;)"><span class="nav-ic">⚙️</span>Settings</div>
 </nav>
 
@@ -717,7 +778,7 @@ function showPage(name) {
   document.getElementById('mob-'+name)?.classList.add('active');
   stopScanner();
   const renders = { dashboard: renderDash, food: renderFoodPage, exercise: renderExPage,
-    pantry: renderPantry, shopping: renderShopping, body: renderBodyPage, analytics: renderAnalytics, settings: loadSettings };
+    pantry: renderPantry, shopping: renderShopping, body: renderBodyPage, analytics: renderAnalytics, settings: loadSettings, claude: renderClaudePage };
   // Ensure settings goals are loaded for progress bars
   if (name === 'dashboard') setTimeout(renderDash, 50);
   renders[name]?.();
@@ -1908,6 +1969,164 @@ function preshopSkip() {
   } else {
     showPreshopItem();
   }
+}
+
+
+// ── CLAUDE PROMPT GENERATION ─────────────────────────────
+
+function generateRecipePrompt() {
+  const pantry = getPantry();
+  const goals = getGoals();
+  const maxCals = document.getElementById('recipe-cals').value || 600;
+  const count = document.getElementById('recipe-count').value || 5;
+  const pref = document.getElementById('recipe-pref').value;
+
+  if (!pantry.length) {
+    toast('Add items to your pantry first');
+    return;
+  }
+
+  // Build pantry list — only items with stock
+  const inStock = pantry
+    .filter(i => parseFloat(i.qty) > 0)
+    .map(i => `${i.name} (${i.qty}${i.unit})`)
+    .join(', ');
+
+  const lowStock = pantry
+    .filter(i => parseFloat(i.qty) <= parseFloat(i.reorder||0) && parseFloat(i.qty) > 0)
+    .map(i => i.name)
+    .join(', ');
+
+  const prompt = `I need recipe suggestions based on my current pantry inventory.
+
+PANTRY (what I have):
+${inStock}
+${lowStock ? `\nRunning low on: ${lowStock} — prefer recipes that don't rely heavily on these.` : ''}
+
+MY NUTRITION GOALS:
+- Daily calorie target: ${goals.dailyCalories} kcal
+- Daily protein target: ${goals.dailyProtein}g
+- Max calories per serve for these recipes: ${maxCals} kcal
+
+MY CONTEXT:
+- 59 year old male, 95kg, losing weight sustainably
+- Weekly food budget ~$100-125 (Melbourne, Australia)
+- Low fat, healthy whole foods preferred
+- Minimal food waste — use what I have
+${pref ? `- Tonight's preference: ${pref}` : ''}
+
+Please suggest ${count} recipes I can make using primarily what I have in my pantry. For each recipe include:
+1. Recipe name
+2. Ingredients needed (with quantities) — flag anything not in my pantry
+3. Estimated calories and protein per serve
+4. Brief cooking instructions (5-8 steps)
+5. Estimated cost per serve
+
+Prioritise low fat, high protein, nutrient dense meals. Flag if any recipe uses up items that are running low.`;
+
+  document.getElementById('recipe-prompt-text').value = prompt;
+  document.getElementById('recipe-prompt-area').style.display = '';
+  toast('Recipe prompt ready — copy and paste into Claude');
+}
+
+function generateAnalysisPrompt() {
+  const logs = getLogs();
+  const goals = getGoals();
+  const focus = document.getElementById('analysis-focus').value;
+
+  // Get last 7 days
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - 6 + i);
+    return d.toISOString().slice(0,10);
+  });
+
+  // Build daily summaries
+  const dailySummaries = days.map(date => {
+    const log = logs[date];
+    if (!log) return `${date}: No data logged`;
+
+    const foods = log.foods || [];
+    const exercises = log.exercises || [];
+    const cals = Math.round(foods.reduce((s,f) => s+(+f.calories||0), 0));
+    const prot = Math.round(foods.reduce((s,f) => s+(+f.protein||0), 0));
+    const carbs = Math.round(foods.reduce((s,f) => s+(+f.carbs||0), 0));
+    const fat = Math.round(foods.reduce((s,f) => s+(+f.fat||0), 0));
+    const burned = Math.round(exercises.reduce((s,e) => s+estimateBurn(e), 0));
+    const net = cals - burned;
+    const weight = log.bodyStats?.weightKg ? `${log.bodyStats.weightKg}kg` : 'not logged';
+    const posture = log.postureScore ? `${log.postureScore}/5` : 'not rated';
+
+    const exSummary = exercises.length
+      ? exercises.map(e => `${e.name} (${e.session}${e.duration ? ', '+e.duration+'min' : ''}${e.caloriesBurned ? ', '+e.caloriesBurned+'kcal' : ''})`).join('; ')
+      : 'No exercise';
+
+    const mealSummary = foods.length
+      ? foods.map(f => `${f.name} ${f.qty||''} ${f.unit||''}`).join(', ')
+      : 'No food logged';
+
+    return `${date}:
+  Nutrition: ${cals} kcal consumed | ${prot}g protein | ${carbs}g carbs | ${fat}g fat
+  Burned: ${burned} kcal | Net: ${net} kcal
+  Weight: ${weight} | Posture score: ${posture}
+  Exercise: ${exSummary}
+  Food: ${mealSummary}
+  Notes: ${log.notes || 'none'}`;
+  }).join('\n\n');
+
+  // Weight trend
+  const weightEntries = days
+    .filter(d => logs[d]?.bodyStats?.weightKg)
+    .map(d => `${d}: ${logs[d].bodyStats.weightKg}kg`);
+
+  const prompt = `Please analyse my health and fitness data from the last 7 days.
+
+MY PROFILE:
+- Male, 59 years old, current weight ~95kg (started at ~100kg in January 2026)
+- Goal: Lose weight sustainably, target 78-82kg
+- Daily calorie goal: ${goals.dailyCalories} kcal | Protein goal: ${goals.dailyProtein}g
+- Training: Beach walks + ocean wading (mornings), rings/bands/mat (evenings), 5 days/week
+- Medical notes: C7 cervical pain from desk posture (managing with band exercises), minor knee history, anterior pelvic tilt
+
+LAST 7 DAYS DATA:
+${dailySummaries}
+
+${weightEntries.length ? `WEIGHT TREND:\n${weightEntries.join('\n')}` : ''}
+
+${focus ? `SPECIFIC FOCUS: ${focus}` : ''}
+
+Please provide:
+1. Overall progress assessment — am I on track with my goals?
+2. Nutrition analysis — am I hitting calorie and protein targets consistently?
+3. Exercise patterns — volume, consistency, calorie burn
+4. What's working well
+5. What needs attention or adjustment
+6. 3 specific, actionable recommendations for next week
+
+Be direct and honest — I prefer realistic feedback over encouragement.`;
+
+  document.getElementById('analysis-prompt-text').value = prompt;
+  document.getElementById('analysis-prompt-area').style.display = '';
+  toast('Analysis prompt ready — copy and paste into Claude');
+}
+
+function copyPrompt(id) {
+  const text = document.getElementById(id).value;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('Copied to clipboard ✓');
+  }).catch(() => {
+    // Fallback for older browsers
+    const el = document.getElementById(id);
+    el.select();
+    document.execCommand('copy');
+    toast('Copied ✓');
+  });
+}
+
+function renderClaudePage() {
+  // Reset areas when page loads
+  document.getElementById('recipe-prompt-area').style.display = 'none';
+  document.getElementById('analysis-prompt-area').style.display = 'none';
 }
 
 // ── TOAST ────────────────────────────────────────────────────
