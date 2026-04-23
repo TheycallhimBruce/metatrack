@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_8.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_9.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -110,9 +110,9 @@ canvas{width:100%;height:200px}
 .mob-nav.active{color:var(--accl)}
 @media(max-width:768px){
   #sidebar{display:none!important}
-  body{flex-direction:column}
-  #main{padding-bottom:70px}
-  .pw{padding:12px 12px 80px}
+  body{flex-direction:column;overflow:hidden}
+  #main{padding-bottom:70px;height:calc(100vh - 0px);height:calc(100dvh - 0px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;flex:1}
+  .pw{padding:12px 12px 100px}
   .dash-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
   .dash-grid .mc-val{font-size:18px!important}
   .dash-grid .mc{padding:10px}
@@ -422,7 +422,7 @@ canvas{width:100%;height:200px}
 
 <!-- CLAUDE -->
 <div class="page" id="page-claude">
-  <div class="pw" style="padding-bottom:100px">
+  <div class="pw">
     <div class="ph">
       <div class="ph-l">
         <div class="pt">Ask Claude</div>
@@ -481,7 +481,7 @@ canvas{width:100%;height:200px}
 
 <!-- MOBILE NAV -->
 <nav id="mobile-nav">
-  <div class="mob-nav" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
+  <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
   <div class="mob-nav" id="mob-food" onclick="showPage(&#39;food&#39;)"><span class="nav-ic">🍽</span>Food</div>
   <div class="mob-nav" id="mob-exercise" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span>Train</div>
   <div class="mob-nav" id="mob-pantry" onclick="showPage(&#39;pantry&#39;)"><span class="nav-ic">📦</span>Pantry</div>
