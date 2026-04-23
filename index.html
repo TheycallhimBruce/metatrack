@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_5.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_6.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -288,7 +288,8 @@ canvas{width:100%;height:200px}
     <div class="ph">
       <div class="ph-l"><div class="pt">Pantry</div><div class="ps">Current inventory</div></div>
       <div class="ph-r">
-        <button class="btn btn-ghost btn-sm" onclick="genShoppingList()">→ Generate Shopping List</button>
+        <button class="btn btn-ghost btn-sm" onclick="genShoppingList()">→ Shopping List</button>
+        <button class="btn btn-ghost btn-sm" onclick="openModal(&#39;modal-pantry-scan&#39;)">📷 Scan Item</button>
         <button class="btn btn-pri" onclick="openModal(&#39;modal-pantry-item&#39;)">+ Add Item</button>
       </div>
     </div>
@@ -309,6 +310,7 @@ canvas{width:100%;height:200px}
     <div class="ph">
       <div class="ph-l"><div class="pt">Shopping List</div></div>
       <div class="ph-r">
+        <button class="btn btn-ok btn-sm" onclick="startPreShopCheck()">✓ Pre-Shop Check</button>
         <button class="btn btn-ghost btn-sm" onclick="clearPurchased()">Clear Purchased</button>
         <button class="btn btn-pri" onclick="openModal(&#39;modal-shopping-item&#39;)">+ Add Item</button>
       </div>
@@ -436,7 +438,6 @@ canvas{width:100%;height:200px}
   <div class="modal-h"><h3>Add Food</h3><button class="modal-close" onclick="closeModal(&#39;modal-food&#39;)">✕</button></div>
   <div class="tabs">
     <div class="tab active" onclick="switchFoodTab(&#39;search&#39;)">🔍 Search</div>
-    <div class="tab" onclick="switchFoodTab(&#39;barcode&#39;)">📷 Barcode</div>
     <div class="tab" onclick="switchFoodTab(&#39;manual&#39;)">✏️ Manual</div>
   </div>
 
@@ -449,14 +450,6 @@ canvas{width:100%;height:200px}
     <div id="food-search-results" class="search-results"></div>
   </div>
 
-  <!-- BARCODE TAB -->
-  <div id="ftab-barcode" style="display:none">
-    <div class="scan-wrap" id="scan-wrap"><div style="color:var(--txt3);font-size:13px">Press Start to activate camera</div></div>
-    <div style="text-align:center;margin-bottom:12px">
-      <button class="btn btn-pri" id="scan-btn" onclick="toggleScanner()">▶ Start Scanner</button>
-    </div>
-    <div id="scan-result"></div>
-  </div>
 
   <!-- MANUAL TAB -->
   <div id="ftab-manual" style="display:none">
@@ -632,6 +625,61 @@ canvas{width:100%;height:200px}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
       <button onclick="closeModal(&#39;modal-session-summary&#39;)" style="padding:16px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation">Discard</button>
       <button onclick="logSessionToExercise()" style="padding:16px;background:var(--acc);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;touch-action:manipulation">Log Session ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PANTRY BARCODE SCAN -->
+<div class="overlay" id="modal-pantry-scan">
+  <div class="modal">
+    <div class="modal-h"><h3>Scan Pantry Item</h3><button class="modal-close" onclick="closeModal(&#39;modal-pantry-scan&#39;);stopPantryScan()">✕</button></div>
+    <div class="scan-wrap" id="pantry-scan-wrap" style="min-height:240px"><div style="color:var(--txt3);font-size:13px;text-align:center">Press Start to activate camera</div></div>
+    <div style="text-align:center;margin:12px 0">
+      <button class="btn btn-pri" id="pantry-scan-btn" onclick="togglePantryScan()">▶ Start Scanner</button>
+    </div>
+    <div id="pantry-scan-result"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal(&#39;modal-pantry-scan&#39;);stopPantryScan()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: WASTE -->
+<div class="overlay" id="modal-waste">
+  <div class="modal">
+    <div class="modal-h"><h3>Log Waste</h3><button class="modal-close" onclick="closeModal(&#39;modal-waste&#39;)">✕</button></div>
+    <input type="hidden" id="waste-idx">
+    <div id="waste-item-name" style="font-weight:700;font-size:16px;margin-bottom:16px;color:var(--warn)"></div>
+    <div class="fgrid fc2">
+      <div class="frow"><label>Amount Wasted</label><input type="number" id="waste-qty" placeholder="0" step="0.1"></div>
+      <div class="frow"><label>Unit</label><div id="waste-unit" style="padding:10px 0;font-weight:600;color:var(--txt2)"></div></div>
+    </div>
+    <div class="frow"><label>Reason (optional)</label>
+      <select id="waste-reason">
+        <option>Expired / went off</option>
+        <option>Cooked too much</option>
+        <option>Spilled / damaged</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal(&#39;modal-waste&#39;)">Cancel</button>
+      <button class="btn btn-pri" style="background:var(--warn)" onclick="logWaste()">Log Waste</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PRE-SHOP CHECK -->
+<div class="overlay" id="modal-preshop">
+  <div class="modal">
+    <div class="modal-h">
+      <h3>Pre-Shop Check</h3>
+      <span id="preshop-progress" style="font-size:13px;color:var(--txt2)"></span>
+    </div>
+    <div id="preshop-content"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
+      <button onclick="preshopSkip()" style="padding:14px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">Skip</button>
+      <button onclick="preshopNext()" style="padding:14px;background:var(--acc);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation" id="preshop-next-btn">Looks Good →</button>
     </div>
   </div>
 </div>
@@ -858,6 +906,7 @@ function addFoodEntry() {
     notes: document.getElementById('fc-notes').value
   };
   const log = getLog(S.date); (log.foods = log.foods||[]).push(entry); saveLog(S.date, log);
+  deductFromPantry(entry.name, entry.qty, entry.unit);
   closeModal('modal-food'); renderFoodPage(); renderDash(); toast(`${entry.name} added ✓`);
 }
 
@@ -873,6 +922,7 @@ function addManualFood() {
     fat: +document.getElementById('f-fat').value||0
   };
   const log = getLog(S.date); (log.foods = log.foods||[]).push(entry); saveLog(S.date, log);
+  deductFromPantry(entry.name, entry.qty, entry.unit);
   closeModal('modal-food'); renderFoodPage(); renderDash(); toast(`${entry.name} added ✓`);
 }
 
@@ -1059,7 +1109,8 @@ function renderPantry() {
       </div></td>
       <td>${item.unit}</td><td>${item.reorder||0} ${item.unit}</td>
       <td><span class="pantry-badge ${low ? 'pantry-low' : 'pantry-ok'}">${low ? '⚠ Low' : '✓ OK'}</span></td>
-      <td style="display:flex;gap:6px">
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-warn btn-sm" onclick="openWaste(${i})" style="background:var(--warnbg);color:var(--warn)">🗑 Waste</button>
         <button class="btn btn-ghost btn-sm" onclick="editPantryItem(${i})">Edit</button>
         <button class="btn btn-err btn-sm" onclick="deletePantryItem(${i})">✕</button>
       </td></tr>`;
@@ -1386,12 +1437,10 @@ document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e
 
 function switchFoodTab(tab) {
   S.foodTab = tab;
-  document.querySelectorAll('#modal-food .tab').forEach((t,i) => t.classList.toggle('active', ['search','barcode','manual'][i]===tab));
+  document.querySelectorAll('#modal-food .tab').forEach((t,i) => t.classList.toggle('active', ['search','manual'][i]===tab));
   document.getElementById('ftab-search').style.display = tab==='search' ? '' : 'none';
-  document.getElementById('ftab-barcode').style.display = tab==='barcode' ? '' : 'none';
   document.getElementById('ftab-manual').style.display = tab==='manual' ? '' : 'none';
   document.getElementById('add-manual-btn').style.display = tab==='manual' ? '' : 'none';
-  if (tab !== 'barcode') stopScanner();
   if (tab === 'manual') { document.getElementById('add-food-btn').style.display = 'none'; document.getElementById('food-confirm').style.display = 'none'; }
 }
 
@@ -1641,6 +1690,224 @@ function fmtDur(ms) {
   return h > 0
     ? `${h}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`
     : `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+
+// ── PANTRY BARCODE SCAN ──────────────────────────────────
+let pantryScanner = null;
+
+async function togglePantryScan() {
+  if (pantryScanner) { stopPantryScan(); return; }
+  const btn = document.getElementById('pantry-scan-btn');
+  const resultEl = document.getElementById('pantry-scan-result');
+  const wrapEl = document.getElementById('pantry-scan-wrap');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Camera not supported.</div>';
+    return;
+  }
+  if (!window.BarcodeDetector) {
+    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Barcode scanning requires Chrome 83+ on Android.</div>';
+    return;
+  }
+
+  btn.textContent = '⏹ Stop'; btn.disabled = true;
+  resultEl.innerHTML = '<div style="color:var(--txt2);font-size:13px;padding:8px">Starting camera...</div>';
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.setAttribute('playsinline', true);
+    video.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:10px';
+    wrapEl.innerHTML = '';
+    wrapEl.appendChild(video);
+    await video.play();
+
+    pantryScanner = { stream, video, active: true };
+    btn.disabled = false;
+    resultEl.innerHTML = '<div style="color:var(--ok);font-size:13px;padding:8px">Point at a barcode</div>';
+
+    const detector = new BarcodeDetector({ formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39'] });
+    const scan = async () => {
+      if (!pantryScanner || !pantryScanner.active) return;
+      try {
+        const barcodes = await detector.detect(video);
+        if (barcodes.length > 0) {
+          stopPantryScan();
+          await lookupPantryBarcode(barcodes[0].rawValue);
+          return;
+        }
+      } catch(e) {}
+      if (pantryScanner && pantryScanner.active) requestAnimationFrame(scan);
+    };
+    requestAnimationFrame(scan);
+  } catch(e) {
+    pantryScanner = null; btn.textContent = '▶ Start Scanner'; btn.disabled = false;
+    resultEl.innerHTML = `<div style="color:var(--err);font-size:13px;padding:8px">${e.name === 'NotAllowedError' ? 'Camera permission denied.' : 'Camera error: ' + e.message}</div>`;
+  }
+}
+
+function stopPantryScan() {
+  if (!pantryScanner) return;
+  if (pantryScanner.stream) pantryScanner.stream.getTracks().forEach(t => t.stop());
+  pantryScanner.active = false; pantryScanner = null;
+  const wrapEl = document.getElementById('pantry-scan-wrap');
+  if (wrapEl) wrapEl.innerHTML = '<div style="color:var(--txt3);font-size:13px;text-align:center">Press Start to activate camera</div>';
+  const btn = document.getElementById('pantry-scan-btn');
+  if (btn) { btn.textContent = '▶ Start Scanner'; btn.disabled = false; }
+}
+
+async function lookupPantryBarcode(barcode) {
+  const resultEl = document.getElementById('pantry-scan-result');
+  resultEl.innerHTML = `<div style="color:var(--txt2);font-size:13px;padding:8px">Looking up ${barcode}...</div>`;
+  try {
+    const r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const data = await r.json();
+    if (data.status !== 1 || !data.product) {
+      resultEl.innerHTML = '<div style="color:var(--warn);font-size:13px;padding:8px">Product not found — add manually.</div>';
+      return;
+    }
+    const p = data.product;
+    // Pre-fill pantry item form and open it
+    closeModal('modal-pantry-scan');
+    document.getElementById('pantry-edit-idx').value = -1;
+    document.getElementById('pantry-modal-title').textContent = 'Add Pantry Item';
+    document.getElementById('pi-name').value = p.product_name || '';
+    document.getElementById('pi-qty').value = '';
+    document.getElementById('pi-reorder').value = '';
+    document.getElementById('pi-notes').value = p.brands ? `Brand: ${p.brands}` : '';
+    // Guess unit from product
+    const qty = p.quantity || '';
+    if (qty.includes('ml') || qty.includes('L')) document.getElementById('pi-unit').value = 'ml';
+    else if (qty.includes('kg')) document.getElementById('pi-unit').value = 'kg';
+    else document.getElementById('pi-unit').value = 'g';
+    openModal('modal-pantry-item');
+    toast(`Found: ${p.product_name} — enter your quantity`);
+  } catch(e) {
+    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Lookup failed — check connection.</div>';
+  }
+}
+
+// ── WASTE LOGGING ────────────────────────────────────────
+function openWaste(i) {
+  const item = getPantry()[i];
+  document.getElementById('waste-idx').value = i;
+  document.getElementById('waste-item-name').textContent = item.name;
+  document.getElementById('waste-unit').textContent = item.unit;
+  document.getElementById('waste-qty').value = '';
+  openModal('modal-waste');
+}
+
+function logWaste() {
+  const i = +document.getElementById('waste-idx').value;
+  const qty = parseFloat(document.getElementById('waste-qty').value);
+  if (isNaN(qty) || qty <= 0) { toast('Enter a valid amount'); return; }
+  const items = getPantry();
+  items[i].qty = Math.max(0, parseFloat(items[i].qty||0) - qty);
+  // Log waste entry
+  const wasteLog = DB.read('wastelog') || [];
+  wasteLog.push({ date: today(), item: items[i].name, qty, unit: items[i].unit, reason: document.getElementById('waste-reason').value });
+  DB.set('wastelog', wasteLog);
+  savePantryDB(items);
+  closeModal('modal-waste');
+  renderPantry();
+  toast(`Logged ${qty}${items[i].unit} waste ✓`);
+  scheduleSync();
+}
+
+// ── AUTO-DEDUCT FROM PANTRY WHEN FOOD LOGGED ────────────
+function deductFromPantry(foodName, qty, unit) {
+  const items = getPantry();
+  const name = foodName.toLowerCase();
+  const idx = items.findIndex(item => {
+    const pname = item.name.toLowerCase();
+    return name.includes(pname) || pname.includes(name.split(' ')[0]);
+  });
+  if (idx === -1) return;
+  const item = items[idx];
+  // Convert units if needed (basic)
+  let deduct = parseFloat(qty) || 0;
+  if (unit === 'kg' && item.unit === 'g') deduct *= 1000;
+  if (unit === 'g' && item.unit === 'kg') deduct /= 1000;
+  if (unit === 'L' && item.unit === 'ml') deduct *= 1000;
+  if (unit === 'ml' && item.unit === 'L') deduct /= 1000;
+  items[idx].qty = Math.max(0, parseFloat(item.qty||0) - deduct);
+  savePantryDB(items);
+  toast(`Pantry updated: ${item.name} → ${items[idx].qty}${item.unit}`);
+}
+
+// ── PRE-SHOP CHECK ───────────────────────────────────────
+let preshopItems = [];
+let preshopIdx = 0;
+
+function startPreShopCheck() {
+  preshopItems = getPantry();
+  if (!preshopItems.length) { toast('Pantry is empty — add items first'); return; }
+  preshopIdx = 0;
+  showPreshopItem();
+  openModal('modal-preshop');
+}
+
+function showPreshopItem() {
+  const item = preshopItems[preshopIdx];
+  document.getElementById('preshop-progress').textContent = `${preshopIdx+1} of ${preshopItems.length}`;
+  document.getElementById('preshop-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:22px;font-weight:800;margin-bottom:4px">${item.name}</div>
+      <div style="font-size:13px;color:var(--txt2);margin-bottom:20px"><span class="tag">${item.category||''}</span></div>
+      <div style="font-size:14px;color:var(--txt2);margin-bottom:10px">How much do you have?</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px">
+        <button class="qty-btn" style="width:40px;height:40px;font-size:20px" onclick="preshopAdj(-1)">−</button>
+        <div style="text-align:center;min-width:100px">
+          <input type="number" id="preshop-qty" value="${item.qty}" step="0.1"
+            style="width:80px;text-align:center;font-size:22px;font-weight:800;padding:8px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;color:var(--txt)">
+          <div style="font-size:13px;color:var(--txt3);margin-top:4px">${item.unit}</div>
+        </div>
+        <button class="qty-btn" style="width:40px;height:40px;font-size:20px" onclick="preshopAdj(1)">+</button>
+      </div>
+      ${parseFloat(item.qty) <= parseFloat(item.reorder||0)
+        ? `<div style="margin-top:14px;padding:8px 14px;background:var(--errbg);color:var(--err);border-radius:8px;font-size:13px;font-weight:600">⚠ Below reorder level (${item.reorder} ${item.unit}) — will be added to shopping list</div>`
+        : ''}
+    </div>`;
+  document.getElementById('preshop-next-btn').textContent = preshopIdx < preshopItems.length - 1 ? 'Looks Good →' : 'Finish & Generate List';
+}
+
+function preshopAdj(delta) {
+  const inp = document.getElementById('preshop-qty');
+  inp.value = Math.max(0, (parseFloat(inp.value)||0) + delta);
+}
+
+function preshopSave() {
+  const qty = parseFloat(document.getElementById('preshop-qty').value)||0;
+  preshopItems[preshopIdx].qty = qty;
+}
+
+function preshopNext() {
+  preshopSave();
+  preshopIdx++;
+  if (preshopIdx >= preshopItems.length) {
+    savePantryDB(preshopItems);
+    closeModal('modal-preshop');
+    genShoppingList();
+    showPage('shopping');
+    toast('Pantry updated — shopping list generated ✓');
+  } else {
+    showPreshopItem();
+  }
+}
+
+function preshopSkip() {
+  preshopIdx++;
+  if (preshopIdx >= preshopItems.length) {
+    savePantryDB(preshopItems);
+    closeModal('modal-preshop');
+    genShoppingList();
+    showPage('shopping');
+    toast('Shopping list generated ✓');
+  } else {
+    showPreshopItem();
+  }
 }
 
 // ── TOAST ────────────────────────────────────────────────────
