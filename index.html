@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_2.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_3.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -155,8 +155,8 @@ canvas{width:100%;height:200px}
   </div>
   <div class="sb-bot">
     <div style="display:flex;align-items:center;font-size:12px;color:var(--txt3);padding:8px 4px">
-      <span class="sync-dot" id="sync-dot"></span>
-      <span id="sync-status">Not connected</span>
+      <span class="sync-dot ok" id="sync-dot"></span>
+      <span id="sync-status">Connected</span>
     </div>
     <button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:12px" onclick="syncNow()">↕ Sync to Sheets</button>
   </div>
@@ -170,7 +170,7 @@ canvas{width:100%;height:200px}
     <div class="ph">
       <div class="ph-l">
         <div class="pt" id="dash-title">Today</div>
-        <div class="ps" id="dash-date-lbl"></div>
+        <div class="ps" id="dash-date-lbl">Today — Thursday 23 April 2026</div>
       </div>
       <div class="ph-r">
         <input type="date" id="dash-date" style="width:160px" onchange="changeDate(this.value)">
@@ -179,10 +179,10 @@ canvas{width:100%;height:200px}
     <div class="grid dash-grid" style="margin-bottom:12px">
       <div class="mc mc-in">
         <div class="mc-lbl">Cal In</div>
-        <div class="mc-val" id="d-cals">0</div>
+        <div class="mc-val" id="d-cals">2000</div>
         <div class="mc-unit">kcal</div>
-        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px"></div>
-        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
+        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 100%</div>
+        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background: var(--err); width: 100%;"></div></div>
       </div>
       <div class="mc mc-burn">
         <div class="mc-lbl">Burned</div>
@@ -191,7 +191,7 @@ canvas{width:100%;height:200px}
       </div>
       <div class="mc mc-net">
         <div class="mc-lbl">Net</div>
-        <div class="mc-val" id="d-net">0</div>
+        <div class="mc-val" id="d-net">2000</div>
         <div class="mc-unit">kcal</div>
       </div>
     </div>
@@ -216,7 +216,7 @@ canvas{width:100%;height:200px}
           <span class="ct">Today's Food</span>
           <button class="btn btn-pri btn-sm" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button>
         </div>
-        <div id="dash-food-list"><div class="empty"><div class="et">Nothing logged yet</div></div></div>
+        <div id="dash-food-list"><div class="sr"><span class="sr-l">Meal — test</span><span class="sr-v" style="color:var(--err)">0 kcal</span></div><div class="sr"><span class="sr-l">Meal — blob</span><span class="sr-v" style="color:var(--err)">2000 kcal</span></div></div>
       </div>
       <div class="card">
         <div class="ch">
@@ -229,7 +229,7 @@ canvas{width:100%;height:200px}
         <div id="dash-ex-list"><div class="empty"><div class="et">No exercise logged</div></div></div>
         <div class="divider"></div>
         <div class="ch" style="margin-bottom:10px"><span class="ct">Posture Score</span></div>
-        <div class="stars" id="dash-stars"></div>
+        <div class="stars" id="dash-stars"><span class="star " onclick="setPosture(1)">★</span><span class="star " onclick="setPosture(2)">★</span><span class="star " onclick="setPosture(3)">★</span><span class="star " onclick="setPosture(4)">★</span><span class="star " onclick="setPosture(5)">★</span></div>
       </div>
     </div>
     <div class="card" style="margin-top:14px">
@@ -243,7 +243,7 @@ canvas{width:100%;height:200px}
 <div class="page" id="page-food">
   <div class="pw">
     <div class="ph">
-      <div class="ph-l"><div class="pt">Food Log</div><div class="ps" id="food-date-lbl"></div></div>
+      <div class="ph-l"><div class="pt">Food Log</div><div class="ps" id="food-date-lbl">Today — Thursday 23 April 2026</div></div>
       <div class="ph-r"><button class="btn btn-pri" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button></div>
     </div>
     <div class="card" style="margin-bottom:14px">
@@ -266,7 +266,7 @@ canvas{width:100%;height:200px}
 <div class="page" id="page-exercise">
   <div class="pw">
     <div class="ph">
-      <div class="ph-l"><div class="pt">Exercise Log</div><div class="ps" id="ex-date-lbl"></div></div>
+      <div class="ph-l"><div class="pt">Exercise Log</div><div class="ps" id="ex-date-lbl">Today — Thursday 23 April 2026</div></div>
       <div class="ph-r">
         <button class="btn btn-ok" onclick="startSession()">🚶 Start Walk/Wade</button>
         <button class="btn btn-pri" onclick="openModal(&#39;modal-exercise&#39;)">+ Log Exercise</button>
@@ -643,21 +643,21 @@ canvas{width:100%;height:200px}
 
 // ── DATA LAYER ──────────────────────────────────────────────
 const DB = {
-  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
-  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
-  del: k => localStorage.removeItem(k)
+  read: function(k) { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } },
+  set: function(k,v) { localStorage.setItem(k, JSON.stringify(v)); },
+  del: function(k) { localStorage.removeItem(k); }
 };
 
 const today = () => new Date().toISOString().slice(0,10);
 let S = { date: today(), foodTab: 'search', scanner: null, pendingFood: null, editPantryIdx: -1 };
 
-function getLogs() { return DB.get('logs') || {}; }
+function getLogs() { return DB.read('logs') || {}; }
 function getLog(d) { const l = getLogs(); return l[d] || { foods:[], exercises:[], postureScore:0, notes:'', totalCaloriesBurned:0 }; }
 function saveLog(d, log) { const l = getLogs(); l[d] = log; DB.set('logs', l); }
-function getGoals() { return DB.get('goals') || { dailyCalories:2000, dailyProtein:150, dailyNetCaloriesTarget:0, weeklyExerciseVolumeTarget:300 }; }
-function getPantry() { return DB.get('pantry') || []; }
+function getGoals() { return DB.read('goals') || { dailyCalories:2000, dailyProtein:150, dailyNetCaloriesTarget:0, weeklyExerciseVolumeTarget:300 }; }
+function getPantry() { return DB.read('pantry') || []; }
 function savePantryDB(items) { DB.set('pantry', items); }
-function getShopping() { return DB.get('shopping') || []; }
+function getShopping() { return DB.read('shopping') || []; }
 function saveShoppingDB(items) { DB.set('shopping', items); }
 
 // ── ROUTING ─────────────────────────────────────────────────
@@ -892,7 +892,7 @@ async function toggleScanner() {
 
   // Check camera API available
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Camera not available on this browser. Make sure you're using Chrome on Android.</div>';
+    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Camera not available on this browser. Use Chrome on Android.</div>';
     return;
   }
 
@@ -934,7 +934,7 @@ async function toggleScanner() {
 
 function stopScanner() {
   if (!S.scanner) return;
-  try { S.scanner.stop().then(() => { S.scanner.clear(); S.scanner = null; }); } catch {}
+  try { S.scanner.stop().then(() => { S.scanner.clear(); S.scanner = null; }); } catch(e) {}
   const btn = document.getElementById('scan-btn');
   if (btn) btn.textContent = '▶ Start Scanner';
 }
@@ -1165,7 +1165,7 @@ function saveBodyStats() {
   log.bodyStats = { weightKg: wt, waistCm: parseFloat(document.getElementById('b-waist').value)||null };
   saveLog(S.date, log);
   closeModal('modal-body'); renderBodyPage(); renderDash(); toast('Stats saved ✓');
-  if (DB.get('syncUrl')) syncWeight(wt);
+  if (DB.read('syncUrl')) syncWeight(wt);
 }
 
 // ── ANALYTICS ───────────────────────────────────────────────
@@ -1213,12 +1213,12 @@ function renderExChart(){const canvas=document.getElementById('chart-ex'),logs=g
 
 // ── SETTINGS ────────────────────────────────────────────────
 function loadSettings() {
-  const bl = DB.get('beachLocation');
+  const bl = DB.read('beachLocation');
   const st = document.getElementById('beach-loc-status');
   if (bl && st) st.innerHTML = `<span style="color:var(--ok)">✓ Beach saved: ${bl.lat.toFixed(5)}, ${bl.lng.toFixed(5)}</span>`;
   else if (st) st.textContent = 'Not set yet';
 
-  const url = DB.get('syncUrl')||'';
+  const url = DB.read('syncUrl')||'';
   document.getElementById('sync-url').value = url;
   const g = getGoals();
   document.getElementById('g-cals').value = g.dailyCalories;
@@ -1226,8 +1226,8 @@ function loadSettings() {
   document.getElementById('g-net').value = g.dailyNetCaloriesTarget;
   document.getElementById('g-ex').value = g.weeklyExerciseVolumeTarget;
 
-  const wt = DB.get('userWeightKg') || 95;
-  const ht = DB.get('userHeightCm') || 172;
+  const wt = DB.read('userWeightKg') || 95;
+  const ht = DB.read('userHeightCm') || 172;
   document.getElementById('g-weight').value = wt;
   document.getElementById('g-height').value = ht;
   updateBurnPreview();
@@ -1259,7 +1259,7 @@ function saveGoals() {
 }
 
 async function testConnection() {
-  const url = DB.get('syncUrl');
+  const url = DB.read('syncUrl');
   if (!url) { document.getElementById('conn-result').innerHTML = '<span style="color:var(--err)">No URL entered</span>'; return; }
   document.getElementById('conn-result').innerHTML = '<span style="color:var(--txt2)">Testing...</span>';
   try {
@@ -1287,7 +1287,7 @@ function importData(e) {
   r.onload = ev => { try { const d = JSON.parse(ev.target.result);
     if (d.logs) DB.set('logs', d.logs); if (d.goals) DB.set('goals', d.goals);
     if (d.pantry) DB.set('pantry', d.pantry); if (d.shopping) DB.set('shopping', d.shopping);
-    renderDash(); toast('Import successful ✓'); } catch { toast('Invalid JSON file'); } };
+    renderDash(); toast('Import successful ✓'); } catch(e) { toast('Invalid JSON file'); } };
   r.readAsText(file);
 }
 
@@ -1300,7 +1300,7 @@ function clearAllData() {
 function updateSyncStatus(status) {
   const dot = document.getElementById('sync-dot');
   const lbl = document.getElementById('sync-status');
-  const url = DB.get('syncUrl');
+  const url = DB.read('syncUrl');
   if (!url) { dot.className='sync-dot'; lbl.textContent='Not connected'; return; }
   if (status === 'ok') { dot.className='sync-dot ok'; lbl.textContent='Connected'; }
   else if (status === 'syncing') { dot.className='sync-dot syncing'; lbl.textContent='Syncing...'; }
@@ -1312,7 +1312,7 @@ let _syncTimer;
 function scheduleSync() { clearTimeout(_syncTimer); _syncTimer = setTimeout(syncNow, 5000); }
 
 async function syncNow() {
-  const url = DB.get('syncUrl'); if (!url) return;
+  const url = DB.read('syncUrl'); if (!url) return;
   updateSyncStatus('syncing');
   try {
     const payload = { action:'syncLogs', logs: JSON.stringify(getLogs()) };
@@ -1327,9 +1327,9 @@ async function syncNow() {
 }
 
 async function syncWeight(wt) {
-  const url = DB.get('syncUrl'); if (!url) return;
+  const url = DB.read('syncUrl'); if (!url) return;
   const weekNum = Math.ceil((new Date() - new Date(new Date().getFullYear(),0,1))/604800000);
-  try { await fetch(url, { method:'POST', body: JSON.stringify({ action:'logWeight', date:S.date, weight:wt, week:weekNum }) }); } catch {}
+  try { await fetch(url, { method:'POST', body: JSON.stringify({ action:'logWeight', date:S.date, weight:wt, week:weekNum }) }); } catch(e) {}
 }
 
 // ── MODALS ──────────────────────────────────────────────────
@@ -1380,13 +1380,11 @@ let _motionHandler = null;
 
 const STRIDE = 0.70; // metres per step (172cm height)
 // MET-based calorie burn: (MET × 3.5 × weight_kg) / 200 = kcal/min
-function getWeightKg() { return parseFloat(DB.get('userWeightKg')) || 95; }
+function getWeightKg() { return parseFloat(DB.read('userWeightKg')) || 95; }
 function metBurn(met) { return (met * 3.5 * getWeightKg()) / 200; }
 const METS = { walk: 3.8, wade: 5.5 };
-const RATES = { 
-  get walk() { return metBurn(METS.walk); },
-  get wade() { return metBurn(METS.wade); }
-};
+function walkRate() { return metBurn(METS.walk); }
+function wadeRate() { return metBurn(METS.wade); }
 
 function startSession() {
   if (SESSION) { showSessionWidget(); return; }
@@ -1461,7 +1459,7 @@ function updateSessionUI() {
 
   const walkMins = walkMs / 60000;
   const wadeMins = wadeMs / 60000;
-  const totalCals = Math.round(walkMins * RATES.walk + wadeMins * RATES.wade);
+  const totalCals = Math.round(walkMins * walkRate() + wadeMins * wadeRate());
   const distM = Math.round(SESSION.totalSteps * STRIDE);
 
   document.getElementById('sess-timer').textContent = fmtDur(elapsed);
@@ -1491,8 +1489,8 @@ function endSession() {
 
   const walkMins = Math.round(walkMs / 60000);
   const wadeMins = Math.round(wadeMs / 60000);
-  const walkCals = Math.round(walkMins * RATES.walk);
-  const wadeCals = Math.round(wadeMins * RATES.wade);
+  const walkCals = Math.round(walkMins * walkRate());
+  const wadeCals = Math.round(wadeMins * wadeRate());
   const totalCals = walkCals + wadeCals;
   const distM = Math.round(SESSION.totalSteps * STRIDE);
 
