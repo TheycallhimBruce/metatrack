@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)file:///C:/Users/Keith/Downloads/MetaTrack_v5.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_2.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>MetaTrack v5</title>
-<script src="./MetaTrack v5_files/html5-qrcode.min.js.download"></script>
+<script src="./index_files/html5-qrcode.min.js.download"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 :root{--bg:#0d0d0d;--sur:#161616;--sur2:#1e1e1e;--sur3:#272727;--bdr:#2e2e2e;--bdr2:#3a3a3a;--txt:#f0f0f0;--txt2:#b0b0b0;--txt3:#555;--acc:#7c3aed;--accl:#9d5ff3;--accbg:rgba(124,58,237,.12);--ok:#10b981;--okbg:rgba(16,185,129,.12);--warn:#f59e0b;--warnbg:rgba(245,158,11,.12);--err:#ef4444;--errbg:rgba(239,68,68,.12);--info:#3b82f6;--infobg:rgba(59,130,246,.12);--sb:220px}
@@ -155,8 +155,8 @@ canvas{width:100%;height:200px}
   </div>
   <div class="sb-bot">
     <div style="display:flex;align-items:center;font-size:12px;color:var(--txt3);padding:8px 4px">
-      <span class="sync-dot ok" id="sync-dot"></span>
-      <span id="sync-status">Connected</span>
+      <span class="sync-dot" id="sync-dot"></span>
+      <span id="sync-status">Not connected</span>
     </div>
     <button class="btn btn-ghost" style="width:100%;margin-top:6px;font-size:12px" onclick="syncNow()">↕ Sync to Sheets</button>
   </div>
@@ -170,7 +170,7 @@ canvas{width:100%;height:200px}
     <div class="ph">
       <div class="ph-l">
         <div class="pt" id="dash-title">Today</div>
-        <div class="ps" id="dash-date-lbl">Today — Thursday 23 April 2026</div>
+        <div class="ps" id="dash-date-lbl"></div>
       </div>
       <div class="ph-r">
         <input type="date" id="dash-date" style="width:160px" onchange="changeDate(this.value)">
@@ -179,10 +179,10 @@ canvas{width:100%;height:200px}
     <div class="grid dash-grid" style="margin-bottom:12px">
       <div class="mc mc-in">
         <div class="mc-lbl">Cal In</div>
-        <div class="mc-val" id="d-cals">2000</div>
+        <div class="mc-val" id="d-cals">0</div>
         <div class="mc-unit">kcal</div>
-        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 100%</div>
-        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background: var(--err); width: 100%;"></div></div>
+        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px"></div>
+        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
       </div>
       <div class="mc mc-burn">
         <div class="mc-lbl">Burned</div>
@@ -191,7 +191,7 @@ canvas{width:100%;height:200px}
       </div>
       <div class="mc mc-net">
         <div class="mc-lbl">Net</div>
-        <div class="mc-val" id="d-net">2000</div>
+        <div class="mc-val" id="d-net">0</div>
         <div class="mc-unit">kcal</div>
       </div>
     </div>
@@ -216,7 +216,7 @@ canvas{width:100%;height:200px}
           <span class="ct">Today's Food</span>
           <button class="btn btn-pri btn-sm" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button>
         </div>
-        <div id="dash-food-list"><div class="sr"><span class="sr-l">Meal — test</span><span class="sr-v" style="color:var(--err)">0 kcal</span></div><div class="sr"><span class="sr-l">Meal — blob</span><span class="sr-v" style="color:var(--err)">2000 kcal</span></div></div>
+        <div id="dash-food-list"><div class="empty"><div class="et">Nothing logged yet</div></div></div>
       </div>
       <div class="card">
         <div class="ch">
@@ -229,7 +229,7 @@ canvas{width:100%;height:200px}
         <div id="dash-ex-list"><div class="empty"><div class="et">No exercise logged</div></div></div>
         <div class="divider"></div>
         <div class="ch" style="margin-bottom:10px"><span class="ct">Posture Score</span></div>
-        <div class="stars" id="dash-stars"><span class="star " onclick="setPosture(1)">★</span><span class="star " onclick="setPosture(2)">★</span><span class="star " onclick="setPosture(3)">★</span><span class="star " onclick="setPosture(4)">★</span><span class="star " onclick="setPosture(5)">★</span></div>
+        <div class="stars" id="dash-stars"></div>
       </div>
     </div>
     <div class="card" style="margin-top:14px">
@@ -243,7 +243,7 @@ canvas{width:100%;height:200px}
 <div class="page" id="page-food">
   <div class="pw">
     <div class="ph">
-      <div class="ph-l"><div class="pt">Food Log</div><div class="ps" id="food-date-lbl">Today — Thursday 23 April 2026</div></div>
+      <div class="ph-l"><div class="pt">Food Log</div><div class="ps" id="food-date-lbl"></div></div>
       <div class="ph-r"><button class="btn btn-pri" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button></div>
     </div>
     <div class="card" style="margin-bottom:14px">
@@ -266,7 +266,7 @@ canvas{width:100%;height:200px}
 <div class="page" id="page-exercise">
   <div class="pw">
     <div class="ph">
-      <div class="ph-l"><div class="pt">Exercise Log</div><div class="ps" id="ex-date-lbl">Today — Thursday 23 April 2026</div></div>
+      <div class="ph-l"><div class="pt">Exercise Log</div><div class="ps" id="ex-date-lbl"></div></div>
       <div class="ph-r">
         <button class="btn btn-ok" onclick="startSession()">🚶 Start Walk/Wade</button>
         <button class="btn btn-pri" onclick="openModal(&#39;modal-exercise&#39;)">+ Log Exercise</button>
@@ -881,22 +881,54 @@ function addManualFood() {
 async function toggleScanner() {
   if (S.scanner) { stopScanner(); return; }
   const btn = document.getElementById('scan-btn');
+  const resultEl = document.getElementById('scan-result');
+  const wrapEl = document.getElementById('scan-wrap');
+
+  // Check library loaded
+  if (typeof Html5Qrcode === 'undefined') {
+    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Scanner library not loaded — check your internet connection and reload the page.</div>';
+    return;
+  }
+
+  // Check camera API available
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Camera not available on this browser. Make sure you're using Chrome on Android.</div>';
+    return;
+  }
+
   btn.textContent = '⏹ Stop Scanner';
-  document.getElementById('scan-result').innerHTML = '';
-  S.scanner = new Html5Qrcode('scan-wrap');
+  btn.disabled = true;
+  resultEl.innerHTML = '<div style="color:var(--txt2);font-size:13px;padding:8px">Starting camera...</div>';
+
+  // Ensure container is visible and has height
+  wrapEl.style.minHeight = '250px';
+
   try {
+    // Pre-request camera permission explicitly
+    await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+
+    S.scanner = new Html5Qrcode('scan-wrap');
     await S.scanner.start(
       { facingMode: 'environment' },
-      { fps: 10, qrbox: { width: 260, height: 140 } },
+      { fps: 10, qrbox: { width: 250, height: 150 } },
       async (code) => {
         stopScanner();
         await lookupBarcode(code);
       },
       () => {}
     );
+    btn.disabled = false;
+    resultEl.innerHTML = '<div style="color:var(--ok);font-size:13px;padding:8px">Camera active — point at a barcode</div>';
   } catch(e) {
-    S.scanner = null; btn.textContent = '▶ Start Scanner';
-    document.getElementById('scan-result').innerHTML = `<div style="color:var(--err);font-size:13px;padding:8px">Camera error: ${e}. Check browser permissions.</div>`;
+    S.scanner = null;
+    btn.textContent = '▶ Start Scanner';
+    btn.disabled = false;
+    const msg = e.name === 'NotAllowedError'
+      ? 'Camera permission denied. Go to Chrome Settings → Site Settings → Camera and allow this site.'
+      : e.name === 'NotFoundError'
+      ? 'No camera found on this device.'
+      : `Camera error: ${e.message || e}`;
+    resultEl.innerHTML = `<div style="color:var(--err);font-size:13px;padding:8px">${msg}</div>`;
   }
 }
 
