@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_7.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_8.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -24,7 +24,7 @@ body{font-family:Inter,system-ui,sans-serif;font-size:14px;background:var(--bg);
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--txt3);display:inline-block;margin-right:6px;transition:background .3s}
 .sync-dot.ok{background:var(--ok)}.sync-dot.err{background:var(--err)}.sync-dot.syncing{background:var(--warn);animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-#main{flex:1;overflow-y:auto;background:var(--bg)}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;background:var(--bg);-webkit-overflow-scrolling:touch}
 .page{display:none}.page.active{display:block}
 .pw{max-width:1100px;margin:0 auto;padding:24px 24px 64px}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px}
@@ -422,7 +422,7 @@ canvas{width:100%;height:200px}
 
 <!-- CLAUDE -->
 <div class="page" id="page-claude">
-  <div class="pw">
+  <div class="pw" style="padding-bottom:100px">
     <div class="ph">
       <div class="ph-l">
         <div class="pt">Ask Claude</div>
@@ -455,7 +455,7 @@ canvas{width:100%;height:200px}
       <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px" onclick="generateRecipePrompt()">Generate Recipe Prompt</button>
       <div id="recipe-prompt-area" style="display:none">
         <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy this and paste it into Claude:</div>
-        <textarea id="recipe-prompt-text" rows="10" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical" readonly=""></textarea>
+        <textarea id="recipe-prompt-text" rows="10" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical;touch-action:pan-y" readonly=""></textarea>
         <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;recipe-prompt-text&#39;)">📋 Copy to Clipboard</button>
       </div>
     </div>
@@ -471,7 +471,7 @@ canvas{width:100%;height:200px}
       <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px" onclick="generateAnalysisPrompt()">Generate Analysis Prompt</button>
       <div id="analysis-prompt-area" style="display:none">
         <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy this and paste it into Claude:</div>
-        <textarea id="analysis-prompt-text" rows="12" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical" readonly=""></textarea>
+        <textarea id="analysis-prompt-text" rows="12" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical;touch-action:pan-y" readonly=""></textarea>
         <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;analysis-prompt-text&#39;)">📋 Copy to Clipboard</button>
       </div>
     </div>
@@ -481,7 +481,7 @@ canvas{width:100%;height:200px}
 
 <!-- MOBILE NAV -->
 <nav id="mobile-nav">
-  <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
+  <div class="mob-nav" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
   <div class="mob-nav" id="mob-food" onclick="showPage(&#39;food&#39;)"><span class="nav-ic">🍽</span>Food</div>
   <div class="mob-nav" id="mob-exercise" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span>Train</div>
   <div class="mob-nav" id="mob-pantry" onclick="showPage(&#39;pantry&#39;)"><span class="nav-ic">📦</span>Pantry</div>
