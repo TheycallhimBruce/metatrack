@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_3.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_4.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -884,10 +884,15 @@ async function toggleScanner() {
   const resultEl = document.getElementById('scan-result');
   const wrapEl = document.getElementById('scan-wrap');
 
-  // Check library loaded
+  // Check library loaded — retry once after short delay
   if (typeof Html5Qrcode === 'undefined') {
-    resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Scanner library not loaded — check your internet connection and reload the page.</div>';
-    return;
+    resultEl.innerHTML = '<div style="color:var(--txt2);font-size:13px;padding:8px">Loading scanner library...</div>';
+    await new Promise(r => setTimeout(r, 2000));
+    if (typeof Html5Qrcode === 'undefined') {
+      resultEl.innerHTML = '<div style="color:var(--err);font-size:13px;padding:8px">Scanner library failed to load. Check your connection and reload the page.</div>';
+      btn.textContent = '▶ Start Scanner';
+      return;
+    }
   }
 
   // Check camera API available
