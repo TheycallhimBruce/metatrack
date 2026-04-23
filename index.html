@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_9.html -->
+<!-- saved from url=(0053)file:///C:/Users/Keith/Downloads/MetaTrack_v5_10.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -110,8 +110,8 @@ canvas{width:100%;height:200px}
 .mob-nav.active{color:var(--accl)}
 @media(max-width:768px){
   #sidebar{display:none!important}
-  body{flex-direction:column;overflow:hidden}
-  #main{padding-bottom:70px;height:calc(100vh - 0px);height:calc(100dvh - 0px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;flex:1}
+  body{flex-direction:column;height:auto;min-height:100vh;overflow-y:auto;overflow-x:hidden}
+  #main{overflow:visible;height:auto;padding-bottom:0}
   .pw{padding:12px 12px 100px}
   .dash-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
   .dash-grid .mc-val{font-size:18px!important}
@@ -408,12 +408,25 @@ canvas{width:100%;height:200px}
     </div>
     <div class="card">
       <div class="ch"><span class="ct">Data</span></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
         <button class="btn btn-ghost" onclick="exportData()">Export JSON</button>
         <button class="btn btn-ghost" onclick="document.getElementById(&#39;import-file&#39;).click()">Import JSON</button>
         <button class="btn btn-err" onclick="clearAllData()">Clear All Data</button>
       </div>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+      <div class="divider"></div>
+      <div class="ch" style="margin-top:16px"><span class="ct">📈 Weekly Health Report</span></div>
+      <p style="font-size:13px;color:var(--txt2);margin-bottom:12px">Packages your last 7 days of data into a Claude prompt for progress analysis.</p>
+      <div class="frow">
+        <label>Specific focus (optional)</label>
+        <input type="text" id="analysis-focus" placeholder="e.g. am I hitting protein goals?">
+      </div>
+      <button class="btn btn-ghost" style="width:100%" onclick="generateAnalysisPrompt()">Generate Weekly Report Prompt</button>
+      <div id="analysis-prompt-area" style="display:none;margin-top:12px">
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy and paste into Claude:</div>
+        <textarea id="analysis-prompt-text" rows="8" style="font-size:12px;background:var(--sur3);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt)" readonly=""></textarea>
+        <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;analysis-prompt-text&#39;)">📋 Copy to Clipboard</button>
+      </div>
     </div>
   </div>
 </div>
@@ -425,15 +438,11 @@ canvas{width:100%;height:200px}
   <div class="pw">
     <div class="ph">
       <div class="ph-l">
-        <div class="pt">Ask Claude</div>
-        <div class="ps">Generate prompts from your real data</div>
+        <div class="pt">🍳 Recipe Suggestions</div>
+        <div class="ps">Based on your pantry and goals</div>
       </div>
     </div>
-
-    <!-- RECIPE CARD -->
-    <div class="card" style="margin-bottom:14px">
-      <div class="ch"><span class="ct">🍳 Recipe Suggestions</span></div>
-      <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Generates a prompt based on what you currently have in your pantry, your calorie goal and budget. Paste it into Claude for recipe ideas.</p>
+    <div class="card">
       <div class="fgrid fc2" style="margin-bottom:14px">
         <div class="frow">
           <label>Max calories per serve</label>
@@ -449,33 +458,16 @@ canvas{width:100%;height:200px}
         </div>
       </div>
       <div class="frow">
-        <label>Any preferences for tonight?</label>
+        <label>Any preferences?</label>
         <input type="text" id="recipe-pref" placeholder="e.g. quick meal, high protein, using chicken...">
       </div>
-      <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px" onclick="generateRecipePrompt()">Generate Recipe Prompt</button>
-      <div id="recipe-prompt-area" style="display:none">
-        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy this and paste it into Claude:</div>
-        <textarea id="recipe-prompt-text" rows="10" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical;touch-action:pan-y" readonly=""></textarea>
+      <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px" onclick="generateRecipePrompt()">Generate Recipe Prompt</button>
+      <div id="recipe-prompt-area" style="display:none;margin-top:14px">
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy and paste into Claude:</div>
+        <textarea id="recipe-prompt-text" rows="8" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt)" readonly=""></textarea>
         <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;recipe-prompt-text&#39;)">📋 Copy to Clipboard</button>
       </div>
     </div>
-
-    <!-- HEALTH ANALYSIS CARD -->
-    <div class="card">
-      <div class="ch"><span class="ct">📈 Health Analysis</span></div>
-      <p style="font-size:13px;color:var(--txt2);margin-bottom:16px">Packages your last 7 days of food, exercise and weight data into a prompt for Claude to analyse your progress and patterns.</p>
-      <div class="frow">
-        <label>Anything specific you want Claude to focus on?</label>
-        <input type="text" id="analysis-focus" placeholder="e.g. am I hitting protein goals? how is my calorie burn tracking?">
-      </div>
-      <button class="btn btn-pri" style="width:100%;padding:14px;font-size:15px;margin-bottom:12px" onclick="generateAnalysisPrompt()">Generate Analysis Prompt</button>
-      <div id="analysis-prompt-area" style="display:none">
-        <div style="font-size:12px;color:var(--txt2);margin-bottom:8px">Copy this and paste it into Claude:</div>
-        <textarea id="analysis-prompt-text" rows="12" style="font-size:12px;background:var(--sur2);border:1px solid var(--bdr2);border-radius:8px;padding:12px;width:100%;color:var(--txt);resize:vertical;touch-action:pan-y" readonly=""></textarea>
-        <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="copyPrompt(&#39;analysis-prompt-text&#39;)">📋 Copy to Clipboard</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
