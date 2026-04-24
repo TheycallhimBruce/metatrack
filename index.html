@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_2.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_6.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -181,44 +181,44 @@ canvas{width:100%;height:200px}
     <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
       <div style="font-size:24px;font-weight:800;letter-spacing:-.5px;color:var(--txt)">Meta<span style="color:var(--accl)">Track</span></div>
       <div style="text-align:right">
-        <div id="dash-date-lbl" style="font-size:11px;color:var(--txt3)">Today — Friday 24 April 2026</div>
-        <input type="date" id="dash-date" onchange="changeDate(this.value)" style="font-size:11px;padding:2px 6px;margin-top:2px;width:130px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:6px;color:var(--txt2)">
+        <div id="dash-date-lbl" style="font-size:11px;color:var(--txt)">Today — Friday 24 April 2026</div>
+        <input type="date" id="dash-date" onchange="changeDate(this.value)" style="font-size:11px;padding:2px 6px;margin-top:2px;width:130px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:6px;color:var(--txt)">
       </div>
     </div>
 
     <!-- TODAY SUMMARY -->
     <div style="background:var(--sur);border:0.5px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Today</div>
+      <div style="font-size:10px;font-weight:700;color:var(--txt);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Today</div>
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
         <div style="background:var(--sur2);border-radius:10px;padding:10px">
-          <div style="font-size:10px;color:var(--txt3);margin-bottom:3px">CAL IN</div>
+          <div style="font-size:10px;color:var(--txt);margin-bottom:3px">CAL IN</div>
           <div class="mc-val mc-in" id="d-cals" style="font-size:20px;color:var(--err)">0</div>
-          <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 0%</div>
+          <div id="d-cals-goal" style="font-size:10px;color:var(--txt);margin-top:2px">Goal: 2000 kcal · 0%</div>
           <div class="pbar" style="margin-top:6px"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
         </div>
         <div style="background:var(--sur2);border-radius:10px;padding:10px">
-          <div style="font-size:10px;color:var(--txt3);margin-bottom:3px">BURNED</div>
+          <div style="font-size:10px;color:var(--txt);margin-bottom:3px">BURNED</div>
           <div id="d-burn" style="font-size:20px;font-weight:800;color:var(--ok)">0</div>
-          <div style="font-size:10px;color:var(--txt3);margin-top:2px">kcal</div>
+          <div style="font-size:10px;color:var(--txt);margin-top:2px">kcal</div>
         </div>
         <div style="background:var(--sur2);border-radius:10px;padding:10px">
-          <div style="font-size:10px;color:var(--txt3);margin-bottom:3px">NET</div>
+          <div style="font-size:10px;color:var(--txt);margin-bottom:3px">NET</div>
           <div id="d-net" style="font-size:20px;font-weight:800;color:var(--info)">0</div>
-          <div style="font-size:10px;color:var(--txt3);margin-top:2px">kcal</div>
+          <div style="font-size:10px;color:var(--txt);margin-top:2px">kcal</div>
         </div>
         <div style="background:var(--sur2);border-radius:10px;padding:10px">
-          <div style="font-size:10px;color:var(--txt3);margin-bottom:3px">PROTEIN</div>
+          <div style="font-size:10px;color:var(--txt);margin-bottom:3px">PROTEIN</div>
           <div id="d-prot" style="font-size:20px;font-weight:800;color:var(--acc)">0g</div>
           <div class="pbar" style="margin-top:6px"><div class="pbar-fill" id="d-prot-bar" style="background:var(--acc);width:0%"></div></div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
         <div style="background:var(--sur2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;color:var(--txt3)">CARBS</span>
+          <span style="font-size:10px;color:var(--txt)">CARBS</span>
           <span id="d-carbs" style="font-size:14px;font-weight:700;color:var(--info)">0g</span>
         </div>
         <div style="background:var(--sur2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:10px;color:var(--txt3)">FAT</span>
+          <span style="font-size:10px;color:var(--txt)">FAT</span>
           <span id="d-fat" style="font-size:14px;font-weight:700;color:var(--warn)">0g</span>
         </div>
       </div>
@@ -241,15 +241,15 @@ canvas{width:100%;height:200px}
 
     <!-- FOOD GROUP -->
     <div style="background:rgba(239,68,68,.06);border:0.5px solid rgba(239,68,68,.25);border-radius:14px;padding:10px;margin-bottom:8px">
-      <div style="font-size:10px;font-weight:700;color:var(--err);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Food</div>
+      <div style="font-size:10px;font-weight:700;color:#ff6b6b;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Food</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <button onclick="openModal(&#39;modal-food&#39;)" style="background:rgba(239,68,68,.1);border:0.5px solid rgba(239,68,68,.3);border-radius:10px;padding:14px 8px;text-align:center;cursor:pointer;touch-action:manipulation">
           <div style="font-size:22px;margin-bottom:4px">🍽</div>
-          <div style="font-size:11px;font-weight:700;color:var(--err)">Log Food</div>
+          <div style="font-size:11px;font-weight:700;color:#ff6b6b">Log Food</div>
         </button>
         <button onclick="showPage(&#39;claude&#39;)" style="background:rgba(239,68,68,.1);border:0.5px solid rgba(239,68,68,.3);border-radius:10px;padding:14px 8px;text-align:center;cursor:pointer;touch-action:manipulation">
           <div style="font-size:22px;margin-bottom:4px">🤖</div>
-          <div style="font-size:11px;font-weight:700;color:var(--err)">Recipe Ideas</div>
+          <div style="font-size:11px;font-weight:700;color:#ff6b6b">Recipe Ideas</div>
         </button>
       </div>
     </div>
@@ -959,7 +959,7 @@ function renderDash() {
   const protPct = goals.dailyProtein > 0 ? Math.min(100, prot/goals.dailyProtein*100) : 0;
   document.getElementById('d-cals-bar').style.width = calPct + '%';
   document.getElementById('d-prot-bar').style.width = protPct + '%';
-  document.getElementById('d-cals-goal').textContent = `Goal: ${goals.dailyCalories} kcal · ${Math.round(calPct)}%`;
+  const goalEl = document.getElementById('d-cals-goal'); if(goalEl) goalEl.textContent = `Goal: ${goals.dailyCalories} kcal · ${Math.round(calPct)}%`;
   document.getElementById('dash-date-lbl').textContent = fmtDateLabel(S.date);
 
   // Lists moved to dedicated pages
