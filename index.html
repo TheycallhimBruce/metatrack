@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_8.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_9.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -73,7 +73,7 @@ label{display:block;font-size:12px;font-weight:600;color:var(--txt2);margin-bott
 .tab.active{background:var(--sur3);color:var(--txt);font-weight:600}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;display:none;align-items:center;justify-content:center;padding:16px}
 .overlay.open{display:flex}
-.modal{background:var(--sur);border:1px solid var(--bdr2);border-radius:16px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative}
+.modal{background:var(--sur);border:1px solid var(--bdr2);border-radius:16px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;-webkit-overflow-scrolling:touch}
 .modal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .modal-h h3{font-size:17px;font-weight:700}
 .modal-close{background:none;border:none;color:var(--txt2);font-size:20px;cursor:pointer;padding:4px;border-radius:6px;line-height:1}
@@ -129,8 +129,9 @@ canvas{width:100%;height:200px}
   .fc3,.fc4{grid-template-columns:1fr 1fr}
   .ph{flex-direction:column;gap:8px}
   .ph-r{width:100%}
-  .modal{max-width:100%;border-radius:16px 16px 0 0;margin-top:auto;max-height:88vh}
+  .modal{max-width:100%;border-radius:16px 16px 0 0;margin-top:auto;max-height:75vh;max-height:75dvh}
   .overlay.open{align-items:flex-end;padding:0}
+  .modal-foot{position:sticky;bottom:0;background:var(--sur);padding-top:12px;margin-top:8px;border-top:1px solid var(--bdr)}
   #mobile-nav{display:block}
   input,select{font-size:16px}
 }
