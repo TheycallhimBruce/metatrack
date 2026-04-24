@@ -1207,12 +1207,14 @@ function showPage(name) {
   document.getElementById('page-'+name).classList.add('active');
   document.querySelector(`.nav[onclick*="${name}"]`)?.classList.add('active');
   // Highlight correct bottom nav group
-  ['mob-dash'].forEach(id => document.getElementById(id)?.classList.remove('active'));
-  const pageToGroup = { dashboard:'mob-dash', workout:'train', exercise:'train',
-    food:'eat', claude:'eat', pantry:'kitchen', shopping:'kitchen',
+  ['mob-dash','mob-food-nav'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  ['train','kitchen','more'].forEach(g => { const el = document.getElementById('mobbtn-'+g); if(el) el.style.color = ''; });
+  const pageToGroup = { dashboard:'mob-dash', food:'mob-food-nav',
+    workout:'train', exercise:'train',
+    claude:'more', pantry:'kitchen', shopping:'kitchen',
     body:'more', analytics:'more', settings:'more' };
   const group = pageToGroup[name];
-  if (group === 'mob-dash') document.getElementById('mob-dash').classList.add('active');
+  if (group === 'mob-dash' || group === 'mob-food-nav') document.getElementById(group)?.classList.add('active');
   else if (group) document.getElementById('mobbtn-'+group).style.color = 'var(--accl)';
   stopScanner();
   const renders = { dashboard: renderDash, food: renderFoodPage, exercise: renderExPage,
