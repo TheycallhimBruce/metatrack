@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)file:///C:/Users/Keith/Downloads/MetaTrack_v5_11.html -->
+<!-- saved from url=(0053)file:///C:/Users/Keith/Downloads/MetaTrack_v5_12.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -640,41 +640,48 @@ canvas{width:100%;height:200px}
 
   <!-- SAVED MEALS TAB -->
   <div id="ftab-saved" style="display:none">
+
+    <!-- LIST VIEW -->
     <div id="saved-meals-view">
       <div id="saved-meals-list"></div>
       <div class="empty" id="saved-meals-empty" style="display:none">
         <div class="ei">⭐</div>
         <div class="et">No saved meals yet</div>
-        <div style="font-size:12px;color:var(--txt3);margin-top:6px">Tap "Create Meal" to build one</div>
+        <div style="font-size:12px;color:var(--txt3);margin-top:6px">Tap below to create one</div>
       </div>
       <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="showCreateMeal()">+ Create New Meal</button>
     </div>
+
+    <!-- BUILDER VIEW -->
     <div id="saved-meals-builder" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-        <button onclick="hideCreateMeal()" style="background:none;border:none;color:var(--txt2);font-size:20px;cursor:pointer;padding:0">←</button>
-        <span style="font-weight:700;font-size:15px">Create Meal</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <button onclick="hideCreateMeal()" style="background:none;border:none;color:var(--txt2);font-size:22px;cursor:pointer;padding:0;line-height:1">←</button>
+        <span style="font-weight:700;font-size:15px">Build a Meal</span>
       </div>
-      <div class="frow"><label>Meal Name</label><input type="text" id="builder-meal-name" placeholder="e.g. Oat Breakfast, Chicken Bowl"></div>
-      <div style="font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Ingredients</div>
-      <div id="builder-ingredients-list" style="margin-bottom:10px"></div>
-      <div style="background:var(--sur2);border:0.5px solid var(--bdr2);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:8px">Add Ingredient</div>
-        <input type="text" id="builder-ing-name" placeholder="Food name" style="margin-bottom:6px">
-        <div class="fgrid fc2" style="margin-bottom:6px">
-          <input type="number" id="builder-ing-qty" placeholder="Qty (e.g. 60)">
-          <select id="builder-ing-unit"><option>g</option><option>ml</option><option>cup</option><option>tbsp</option><option>tsp</option><option>piece</option><option>serve</option></select>
-        </div>
-        <div class="fgrid fc2" style="margin-bottom:6px">
-          <input type="number" id="builder-ing-cals" placeholder="Calories">
-          <input type="number" id="builder-ing-prot" placeholder="Protein (g)">
-        </div>
-        <div class="fgrid fc2" style="margin-bottom:8px">
-          <input type="number" id="builder-ing-carbs" placeholder="Carbs (g)">
-          <input type="number" id="builder-ing-fat" placeholder="Fat (g)">
-        </div>
-        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="addBuilderIngredient()">+ Add to Meal</button>
+      <div class="frow"><label>Meal Name</label><input type="text" id="builder-meal-name" placeholder="e.g. Oat Breakfast"></div>
+
+      <!-- Ingredient search -->
+      <div style="font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Add Ingredients</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input type="text" id="builder-search" placeholder="Search food..." style="flex:1" onkeydown="if(event.key===&#39;Enter&#39;)searchBuilderFood()">
+        <button class="btn btn-pri btn-sm" onclick="searchBuilderFood()">Search</button>
       </div>
-      <div id="builder-totals" style="font-size:12px;color:var(--txt2);margin-bottom:4px"></div>
+      <div id="builder-search-results" style="max-height:180px;overflow-y:auto;margin-bottom:10px"></div>
+
+      <!-- Selected ingredient qty confirm -->
+      <div id="builder-confirm" style="display:none;background:var(--sur2);border:0.5px solid var(--bdr2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div id="builder-confirm-name" style="font-weight:700;margin-bottom:8px"></div>
+        <div class="fgrid fc2">
+          <div class="frow"><label>Quantity</label><input type="number" id="builder-confirm-qty" placeholder="100" value="100" oninput="updateBuilderConfirmPreview()"></div>
+          <div class="frow"><label>Unit</label><select id="builder-confirm-unit" onchange="updateBuilderConfirmPreview()"><option>g</option><option>ml</option><option>piece</option><option>serve</option></select></div>
+        </div>
+        <div id="builder-confirm-macros" style="font-size:12px;color:var(--txt2);margin-bottom:10px"></div>
+        <button class="btn btn-ok btn-sm" style="width:100%" onclick="confirmBuilderIngredient()">+ Add to Meal</button>
+      </div>
+
+      <!-- Ingredients so far -->
+      <div id="builder-ingredients-list" style="margin-bottom:8px"></div>
+      <div id="builder-totals" style="font-size:12px;color:var(--txt2);padding:8px;background:var(--sur2);border-radius:8px;margin-bottom:4px"></div>
     </div>
   </div>
 
@@ -2171,14 +2178,18 @@ function addQuickCalEntry() {
 
 // ── MEAL BUILDER ─────────────────────────────────────────
 let builderIngredients = [];
+let builderPendingFood = null;
 
 function showCreateMeal() {
   builderIngredients = [];
+  builderPendingFood = null;
   document.getElementById('builder-meal-name').value = '';
+  document.getElementById('builder-search').value = '';
+  document.getElementById('builder-search-results').innerHTML = '';
+  document.getElementById('builder-confirm').style.display = 'none';
   document.getElementById('saved-meals-view').style.display = 'none';
   document.getElementById('saved-meals-builder').style.display = '';
   updateBuilderList();
-  // Swap footer buttons
   document.getElementById('add-manual-btn').style.display = '';
   document.getElementById('add-manual-btn').textContent = 'Save Meal ⭐';
   S.foodTab = 'builder';
@@ -2192,66 +2203,122 @@ function hideCreateMeal() {
   renderSavedMealsList();
 }
 
-function addBuilderIngredient() {
-  const name = document.getElementById('builder-ing-name').value.trim();
-  if (!name) { toast('Enter ingredient name'); return; }
-  const ing = {
-    name,
-    qty: document.getElementById('builder-ing-qty').value || '',
-    unit: document.getElementById('builder-ing-unit').value,
-    calories: +document.getElementById('builder-ing-cals').value || 0,
-    protein: +document.getElementById('builder-ing-prot').value || 0,
-    carbs: +document.getElementById('builder-ing-carbs').value || 0,
-    fat: +document.getElementById('builder-ing-fat').value || 0
+async function searchBuilderFood() {
+  const q = document.getElementById('builder-search').value.trim();
+  if (!q) return;
+  const el = document.getElementById('builder-search-results');
+  el.innerHTML = '<div style="padding:10px;color:var(--txt2);font-size:13px">Searching...</div>';
+  try {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=6&fields=product_name,brands,nutriments`;
+    const r = await fetch(url);
+    const data = await r.json();
+    const products = (data.products||[]).filter(p => p.product_name && p.nutriments);
+    if (!products.length) {
+      el.innerHTML = '<div style="padding:10px;color:var(--txt3);font-size:12px">No results — try a different search</div>';
+      return;
+    }
+    el.innerHTML = products.map((p,i) => {
+      const n = p.nutriments;
+      const cal = Math.round(n['energy-kcal_100g']||(n['energy_100g']||0)/4.184);
+      const prot = Math.round(n.proteins_100g||0);
+      return `<div onclick="selectBuilderFood(${i})" class="s-item">
+        <div class="s-item-name">${p.product_name}</div>
+        ${p.brands?`<div class="s-item-brand">${p.brands}</div>`:''}
+        <div class="s-item-macros">${cal} kcal · ${prot}g protein (per 100g)</div>
+      </div>`;
+    }).join('');
+    el.dataset.products = JSON.stringify(products);
+  } catch(e) {
+    el.innerHTML = '<div style="padding:10px;color:var(--err);font-size:12px">Search failed — check connection</div>';
+  }
+}
+
+function selectBuilderFood(i) {
+  const products = JSON.parse(document.getElementById('builder-search-results').dataset.products||'[]');
+  const p = products[i];
+  if (!p) return;
+  const n = p.nutriments;
+  builderPendingFood = {
+    name: p.product_name,
+    cals100: Math.round(n['energy-kcal_100g']||(n['energy_100g']||0)/4.184),
+    prot100: +(n.proteins_100g||0).toFixed(1),
+    carbs100: +(n.carbohydrates_100g||0).toFixed(1),
+    fat100: +(n.fat_100g||0).toFixed(1)
   };
-  builderIngredients.push(ing);
-  // Clear fields
-  ['builder-ing-name','builder-ing-qty','builder-ing-cals','builder-ing-prot','builder-ing-carbs','builder-ing-fat'].forEach(id => {
-    document.getElementById(id).value = '';
+  document.getElementById('builder-confirm-name').textContent = p.product_name;
+  document.getElementById('builder-confirm-qty').value = 100;
+  document.getElementById('builder-search-results').innerHTML = '';
+  document.getElementById('builder-search').value = '';
+  document.getElementById('builder-confirm').style.display = '';
+  updateBuilderConfirmPreview();
+}
+
+function updateBuilderConfirmPreview() {
+  if (!builderPendingFood) return;
+  const qty = +document.getElementById('builder-confirm-qty').value||100;
+  const ratio = qty/100;
+  const cals = Math.round(builderPendingFood.cals100*ratio);
+  const prot = (builderPendingFood.prot100*ratio).toFixed(1);
+  const carbs = (builderPendingFood.carbs100*ratio).toFixed(1);
+  const fat = (builderPendingFood.fat100*ratio).toFixed(1);
+  document.getElementById('builder-confirm-macros').innerHTML =
+    `<span style="color:var(--err)">${cals} kcal</span> · <span style="color:var(--acc)">${prot}g protein</span> · ${carbs}g carbs · ${fat}g fat`;
+}
+
+function confirmBuilderIngredient() {
+  if (!builderPendingFood) return;
+  const qty = +document.getElementById('builder-confirm-qty').value||100;
+  const unit = document.getElementById('builder-confirm-unit').value;
+  const ratio = qty/100;
+  builderIngredients.push({
+    name: builderPendingFood.name,
+    qty, unit,
+    calories: Math.round(builderPendingFood.cals100*ratio),
+    protein: +(builderPendingFood.prot100*ratio).toFixed(1),
+    carbs: +(builderPendingFood.carbs100*ratio).toFixed(1),
+    fat: +(builderPendingFood.fat100*ratio).toFixed(1)
   });
+  builderPendingFood = null;
+  document.getElementById('builder-confirm').style.display = 'none';
   updateBuilderList();
-  toast(`${name} added to meal`);
+  toast('Added to meal ✓');
 }
 
 function removeBuilderIngredient(i) {
-  builderIngredients.splice(i, 1);
+  builderIngredients.splice(i,1);
   updateBuilderList();
 }
 
 function updateBuilderList() {
   const listEl = document.getElementById('builder-ingredients-list');
   const totalsEl = document.getElementById('builder-totals');
-
   if (!builderIngredients.length) {
-    listEl.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:6px 0;margin-bottom:4px">No ingredients yet</div>';
+    listEl.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:4px 0">No ingredients yet — search above</div>';
     totalsEl.innerHTML = '';
     return;
   }
-
-  listEl.innerHTML = builderIngredients.map((ing, i) =>
-    `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--sur2);border-radius:8px;margin-bottom:6px;gap:8px">
+  listEl.innerHTML = builderIngredients.map((ing,i) =>
+    `<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--sur2);border-radius:8px;margin-bottom:6px">
       <div style="flex:1">
         <div style="font-weight:600;font-size:13px">${ing.name}</div>
-        <div style="font-size:11px;color:var(--txt2)">${ing.qty} ${ing.unit} · ${ing.calories} kcal · ${ing.protein}g prot</div>
+        <div style="font-size:11px;color:var(--txt2)">${ing.qty}${ing.unit} · <span style="color:var(--err)">${ing.calories} kcal</span> · ${ing.protein}g prot</div>
       </div>
-      <button onclick="removeBuilderIngredient(${i})" style="background:none;border:none;color:var(--err);font-size:16px;cursor:pointer;padding:4px">✕</button>
+      <button onclick="removeBuilderIngredient(${i})" style="background:none;border:none;color:var(--err);font-size:18px;cursor:pointer;padding:4px;touch-action:manipulation">✕</button>
     </div>`
   ).join('');
-
   const totalCals = Math.round(builderIngredients.reduce((s,i)=>s+i.calories,0));
   const totalProt = builderIngredients.reduce((s,i)=>s+i.protein,0).toFixed(1);
   const totalCarbs = builderIngredients.reduce((s,i)=>s+i.carbs,0).toFixed(1);
   const totalFat = builderIngredients.reduce((s,i)=>s+i.fat,0).toFixed(1);
-  totalsEl.innerHTML = `<strong>Total:</strong> ${totalCals} kcal · ${totalProt}g protein · ${totalCarbs}g carbs · ${totalFat}g fat`;
+  totalsEl.innerHTML = `<strong>Total:</strong> ${totalCals} kcal · ${totalProt}g prot · ${totalCarbs}g carbs · ${totalFat}g fat`;
 }
 
 function saveBuilderMeal() {
   const name = document.getElementById('builder-meal-name').value.trim();
   if (!name) { toast('Enter a meal name'); return; }
   if (!builderIngredients.length) { toast('Add at least one ingredient'); return; }
-
   const meals = getSavedMeals();
-  meals[name] = { name, savedAt: today(), ingredients: builderIngredients };
+  meals[name] = { name, savedAt: today(), ingredients: [...builderIngredients] };
   saveSavedMeals(meals);
   hideCreateMeal();
   toast(`"${name}" saved ✓`);
