@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0050)file:///C:/Users/Keith/Downloads/MetaTrack_v5.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_1.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -103,11 +103,19 @@ canvas{width:100%;height:200px}
 .qty-ctrl{display:flex;align-items:center;gap:6px}
 .qty-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--bdr2);background:var(--sur2);color:var(--txt);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .qty-btn:hover{background:var(--sur3)}
-#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bdr);z-index:50;padding:6px 0 10px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;white-space:nowrap;scrollbar-width:none}
-#mobile-nav::-webkit-scrollbar{display:none}
-.mob-nav{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:4px 10px;border-radius:8px;cursor:pointer;color:var(--txt3);font-size:10px;font-weight:600;transition:all .15s}
-.mob-nav .nav-ic{font-size:18px;width:auto}
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--sur);border-top:1px solid var(--bdr);z-index:50;padding:6px 0 10px}
+.mob-nav{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border-radius:8px;cursor:pointer;color:var(--txt3);font-size:10px;font-weight:600;transition:all .15s;touch-action:manipulation}
+.mob-nav .nav-ic{font-size:20px;width:auto}
 .mob-nav.active{color:var(--accl)}
+.mob-nav-row{display:flex;width:100%}
+.submenu{display:none;position:fixed;bottom:65px;left:0;right:0;z-index:49;padding:8px 12px}
+.submenu.open{display:block}
+.submenu-inner{background:var(--sur);border:1px solid var(--bdr2);border-radius:16px;padding:8px;box-shadow:0 -4px 24px rgba(0,0,0,.4)}
+.submenu-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;color:var(--txt);touch-action:manipulation}
+.submenu-item:hover,.submenu-item:active{background:var(--sur2)}
+.submenu-item .nav-ic{font-size:20px;width:28px;text-align:center}
+.submenu-backdrop{display:none;position:fixed;inset:0;z-index:48}
+.submenu-backdrop.open{display:block}
 @media(max-width:768px){
   #sidebar{display:none!important}
   body{flex-direction:column;height:auto;min-height:100vh;overflow-y:auto;overflow-x:hidden}
@@ -174,69 +182,83 @@ canvas{width:100%;height:200px}
         <div class="ps" id="dash-date-lbl">Today — Friday 24 April 2026</div>
       </div>
       <div class="ph-r">
-        <input type="date" id="dash-date" style="width:160px" onchange="changeDate(this.value)">
+        <input type="date" id="dash-date" style="width:150px" onchange="changeDate(this.value)">
       </div>
     </div>
-    <div class="grid dash-grid" style="margin-bottom:12px">
-      <div class="mc mc-in">
-        <div class="mc-lbl">Cal In</div>
-        <div class="mc-val" id="d-cals">0</div>
-        <div class="mc-unit">kcal</div>
-        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 0%</div>
-        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
-      </div>
-      <div class="mc mc-burn">
-        <div class="mc-lbl">Burned</div>
-        <div class="mc-val" id="d-burn">0</div>
-        <div class="mc-unit">kcal</div>
-      </div>
-      <div class="mc mc-net">
-        <div class="mc-lbl">Net</div>
-        <div class="mc-val" id="d-net">0</div>
-        <div class="mc-unit">kcal</div>
-      </div>
-    </div>
-    <div class="grid dash-grid" style="margin-bottom:24px">
-      <div class="mc mc-prot">
-        <div class="mc-lbl">Protein</div>
-        <div class="mc-val" id="d-prot">0g</div>
-        <div class="pbar" style="margin-top:8px"><div class="pbar-fill" id="d-prot-bar" style="background:var(--acc);width:0%"></div></div>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">Carbs</div>
-        <div class="mc-val" id="d-carbs" style="color:var(--info)">0g</div>
-      </div>
-      <div class="mc">
-        <div class="mc-lbl">Fat</div>
-        <div class="mc-val" id="d-fat" style="color:var(--warn)">0g</div>
-      </div>
-    </div>
-    <div class="grid g2">
-      <div class="card">
-        <div class="ch">
-          <span class="ct">Today's Food</span>
-          <button class="btn btn-pri btn-sm" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button>
+
+    <!-- TODAY SUMMARY CARD -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="ch"><span class="ct">Today's Summary</span></div>
+      <div class="grid dash-grid" style="margin-bottom:10px">
+        <div class="mc mc-in" style="padding:10px">
+          <div class="mc-lbl">Cal In</div>
+          <div class="mc-val" id="d-cals">0</div>
+          <div class="mc-unit">kcal</div>
+          <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 0%</div>
+          <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
         </div>
-        <div id="dash-food-list"><div class="empty"><div class="et">Nothing logged yet</div></div></div>
-      </div>
-      <div class="card">
-        <div class="ch">
-          <span class="ct">Today's Exercise</span>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ok btn-sm" onclick="startSession()">🚶 Start</button>
-            <button class="btn btn-pri btn-sm" onclick="openModal(&#39;modal-exercise&#39;)">+ Log</button>
-          </div>
+        <div class="mc mc-burn" style="padding:10px">
+          <div class="mc-lbl">Burned</div>
+          <div class="mc-val" id="d-burn">0</div>
+          <div class="mc-unit">kcal</div>
         </div>
-        <div id="dash-ex-list"><div class="empty"><div class="et">No exercise logged</div></div></div>
-        <div class="divider"></div>
-        <div class="ch" style="margin-bottom:10px"><span class="ct">Posture Score</span></div>
-        <div class="stars" id="dash-stars"><span class="star " onclick="setPosture(1)">★</span><span class="star " onclick="setPosture(2)">★</span><span class="star " onclick="setPosture(3)">★</span><span class="star " onclick="setPosture(4)">★</span><span class="star " onclick="setPosture(5)">★</span></div>
+        <div class="mc mc-net" style="padding:10px">
+          <div class="mc-lbl">Net</div>
+          <div class="mc-val" id="d-net">0</div>
+          <div class="mc-unit">kcal</div>
+        </div>
+      </div>
+      <div class="grid dash-grid">
+        <div class="mc mc-prot" style="padding:10px">
+          <div class="mc-lbl">Protein</div>
+          <div class="mc-val" id="d-prot">0g</div>
+          <div class="pbar" style="margin-top:6px"><div class="pbar-fill" id="d-prot-bar" style="background:var(--acc);width:0%"></div></div>
+        </div>
+        <div class="mc" style="padding:10px">
+          <div class="mc-lbl">Carbs</div>
+          <div class="mc-val" id="d-carbs" style="color:var(--info)">0g</div>
+        </div>
+        <div class="mc" style="padding:10px">
+          <div class="mc-lbl">Fat</div>
+          <div class="mc-val" id="d-fat" style="color:var(--warn)">0g</div>
+        </div>
       </div>
     </div>
-    <div class="card" style="margin-top:14px">
-      <div class="ch"><span class="ct">Daily Notes</span></div>
-      <textarea id="daily-notes" rows="3" placeholder="How are you feeling today? Any niggles to note?"></textarea>
+
+    <!-- QUICK ACCESS BUTTONS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <button onclick="startSession()" style="padding:18px 12px;background:var(--okbg);color:var(--ok);border:1px solid var(--ok);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">🚶</span>Start Walk / Wade
+      </button>
+      <button onclick="showPage(&#39;workout&#39;)" style="padding:18px 12px;background:var(--accbg);color:var(--accl);border:1px solid var(--acc);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">🏋️</span>Today's Workout
+      </button>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <button onclick="openModal(&#39;modal-food&#39;)" style="padding:18px 12px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">🍽</span>Log Food
+      </button>
+      <button onclick="showPage(&#39;food&#39;)" style="padding:18px 12px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">📋</span>View Food Log
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <button onclick="showPage(&#39;pantry&#39;)" style="padding:18px 12px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">📦</span>Pantry
+      </button>
+      <button onclick="showPage(&#39;shopping&#39;)" style="padding:18px 12px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">🛒</span>Shopping List
+      </button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button onclick="showPage(&#39;body&#39;)" style="padding:18px 12px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">⚖️</span>Body Stats
+      </button>
+      <button onclick="showPage(&#39;claude&#39;)" style="padding:18px 12px;background:var(--infobg);color:var(--info);border:1px solid var(--info);border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <span style="font-size:28px">🤖</span>Recipe Ideas
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -522,18 +544,48 @@ canvas{width:100%;height:200px}
 </div>
 
 <!-- MOBILE NAV -->
+<!-- SUBMENU BACKDROP -->
+<div class="submenu-backdrop" id="submenu-backdrop" onclick="closeAllSubmenus()"></div>
+
+<!-- SUBMENUS -->
+<div class="submenu" id="submenu-train">
+  <div class="submenu-inner">
+    <div class="submenu-item" onclick="startSession();closeAllSubmenus()"><span class="nav-ic">🚶</span>Walk / Wade</div>
+    <div class="submenu-item" onclick="showPage(&#39;workout&#39;);closeAllSubmenus()" id="mob-workout"><span class="nav-ic">🏋️</span>Today's Workout</div>
+    <div class="submenu-item" onclick="showPage(&#39;exercise&#39;);closeAllSubmenus()" id="mob-exercise"><span class="nav-ic">💪</span>Exercise Log</div>
+  </div>
+</div>
+
+<div class="submenu" id="submenu-eat">
+  <div class="submenu-inner">
+    <div class="submenu-item" onclick="showPage(&#39;food&#39;);closeAllSubmenus()" id="mob-food"><span class="nav-ic">🍽</span>Food Log</div>
+    <div class="submenu-item" onclick="showPage(&#39;claude&#39;);closeAllSubmenus()" id="mob-claude"><span class="nav-ic">🤖</span>Recipe Ideas</div>
+  </div>
+</div>
+
+<div class="submenu" id="submenu-kitchen">
+  <div class="submenu-inner">
+    <div class="submenu-item" onclick="showPage(&#39;pantry&#39;);closeAllSubmenus()" id="mob-pantry"><span class="nav-ic">📦</span>Pantry</div>
+    <div class="submenu-item" onclick="showPage(&#39;shopping&#39;);closeAllSubmenus()" id="mob-shopping"><span class="nav-ic">🛒</span>Shopping List</div>
+  </div>
+</div>
+
+<div class="submenu" id="submenu-more">
+  <div class="submenu-inner">
+    <div class="submenu-item" onclick="showPage(&#39;body&#39;);closeAllSubmenus()" id="mob-body"><span class="nav-ic">⚖️</span>Body Stats</div>
+    <div class="submenu-item" onclick="showPage(&#39;analytics&#39;);closeAllSubmenus()" id="mob-analytics"><span class="nav-ic">📊</span>Analytics</div>
+    <div class="submenu-item" onclick="showPage(&#39;settings&#39;);closeAllSubmenus()" id="mob-settings"><span class="nav-ic">⚙️</span>Settings</div>
+  </div>
+</div>
+
 <nav id="mobile-nav">
-  <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
-  <div class="mob-nav" id="mob-workout" onclick="showPage(&#39;workout&#39;)"><span class="nav-ic">🏋️</span>Workout</div>
-  <div class="mob-nav" id="mob-food" onclick="showPage(&#39;food&#39;)"><span class="nav-ic">🍽</span>Food</div>
-  <div class="mob-nav" id="mob-exercise" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span>Log</div>
-  <div class="mob-nav" id="mob-pantry" onclick="showPage(&#39;pantry&#39;)"><span class="nav-ic">📦</span>Pantry</div>
-  <div class="mob-nav" id="mob-shopping" onclick="showPage(&#39;shopping&#39;)"><span class="nav-ic">🛒</span>Shop</div>
-  <div class="mob-nav" onclick="startSession()" style="color:var(--ok)"><span class="nav-ic">🚶</span>Walk</div>
-  <div class="mob-nav" id="mob-body" onclick="showPage(&#39;body&#39;)"><span class="nav-ic">⚖️</span>Body</div>
-  <div class="mob-nav" id="mob-analytics" onclick="showPage(&#39;analytics&#39;)"><span class="nav-ic">📊</span>Stats</div>
-  <div class="mob-nav" id="mob-claude" onclick="showPage(&#39;claude&#39;)"><span class="nav-ic">🤖</span>Claude</div>
-  <div class="mob-nav" id="mob-settings" onclick="showPage(&#39;settings&#39;)"><span class="nav-ic">⚙️</span>Settings</div>
+  <div class="mob-nav-row">
+    <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;);closeAllSubmenus()"><span class="nav-ic">🏠</span>Home</div>
+    <div class="mob-nav" id="mobbtn-train" onclick="toggleSubmenu(&#39;train&#39;)"><span class="nav-ic">🏋️</span>Train</div>
+    <div class="mob-nav" id="mobbtn-eat" onclick="toggleSubmenu(&#39;eat&#39;)"><span class="nav-ic">🍽</span>Eat</div>
+    <div class="mob-nav" id="mobbtn-kitchen" onclick="toggleSubmenu(&#39;kitchen&#39;)"><span class="nav-ic">📦</span>Kitchen</div>
+    <div class="mob-nav" id="mobbtn-more" onclick="toggleSubmenu(&#39;more&#39;)"><span class="nav-ic">•••</span>More</div>
+  </div>
 </nav>
 
 <!-- MODAL: ADD FOOD -->
@@ -827,10 +879,16 @@ function saveShoppingDB(items) { DB.set('shopping', items); }
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.mob-nav').forEach(n => n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.querySelector(`.nav[onclick*="${name}"]`)?.classList.add('active');
-  document.getElementById('mob-'+name)?.classList.add('active');
+  // Highlight correct bottom nav group
+  ['mob-dash'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  const pageToGroup = { dashboard:'mob-dash', workout:'train', exercise:'train',
+    food:'eat', claude:'eat', pantry:'kitchen', shopping:'kitchen',
+    body:'more', analytics:'more', settings:'more' };
+  const group = pageToGroup[name];
+  if (group === 'mob-dash') document.getElementById('mob-dash').classList.add('active');
+  else if (group) document.getElementById('mobbtn-'+group).style.color = 'var(--accl)';
   stopScanner();
   const renders = { dashboard: renderDash, food: renderFoodPage, exercise: renderExPage,
     pantry: renderPantry, shopping: renderShopping, body: renderBodyPage, analytics: renderAnalytics, settings: loadSettings, claude: renderClaudePage, workout: renderWorkoutPage };
@@ -879,33 +937,10 @@ function renderDash() {
   document.getElementById('d-cals-goal').textContent = `Goal: ${goals.dailyCalories} kcal · ${Math.round(calPct)}%`;
   document.getElementById('dash-date-lbl').textContent = fmtDateLabel(S.date);
 
-  const fl = document.getElementById('dash-food-list');
-  fl.innerHTML = foods.length ? foods.slice(-5).map(f =>
-    `<div class="sr"><span class="sr-l">${f.meal} — ${f.name}</span><span class="sr-v" style="color:var(--err)">${Math.round(f.calories||0)} kcal</span></div>`
-  ).join('') : '<div class="empty"><div class="et">Nothing logged yet</div></div>';
-
-  const el = document.getElementById('dash-ex-list');
-  el.innerHTML = exercises.length ? exercises.slice(-4).map(e =>
-    `<div class="sr"><span class="sr-l">${e.name}</span><span class="sr-v">${e.sets ? e.sets+'×'+e.reps : (e.duration+'min')}</span></div>`
-  ).join('') : '<div class="empty"><div class="et">No exercise logged</div></div>';
-
-  S.posture = log.postureScore || 0;
-  renderStars();
-  document.getElementById('daily-notes').value = log.notes || '';
+  // Lists moved to dedicated pages
 }
 
-function renderStars() {
-  const el = document.getElementById('dash-stars');
-  el.innerHTML = [1,2,3,4,5].map(n =>
-    `<span class="star ${n <= S.posture ? 'on' : ''}" onclick="setPosture(${n})">★</span>`
-  ).join('');
-}
-
-function setPosture(n) {
-  S.posture = n; renderStars();
-  const log = getLog(S.date); log.postureScore = n; saveLog(S.date, log);
-  toast('Posture saved ✓');
-}
+// Posture tracking removed from dashboard
 
 // ── FOOD PAGE ───────────────────────────────────────────────
 function renderFoodPage() {
@@ -2542,6 +2577,26 @@ function renderClaudePage() {
   document.getElementById('analysis-prompt-area').style.display = 'none';
 }
 
+
+// ── SUBMENU ──────────────────────────────────────────────
+function toggleSubmenu(name) {
+  const isOpen = document.getElementById('submenu-'+name).classList.contains('open');
+  closeAllSubmenus();
+  if (!isOpen) {
+    document.getElementById('submenu-'+name).classList.add('open');
+    document.getElementById('submenu-backdrop').classList.add('open');
+    document.getElementById('mobbtn-'+name).style.color = 'var(--accl)';
+  }
+}
+
+function closeAllSubmenus() {
+  ['train','eat','kitchen','more'].forEach(n => {
+    document.getElementById('submenu-'+n)?.classList.remove('open');
+    document.getElementById('mobbtn-'+n).style.color = '';
+  });
+  document.getElementById('submenu-backdrop').classList.remove('open');
+}
+
 // ── TOAST ────────────────────────────────────────────────────
 let _tt;
 function toast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),2800); }
@@ -2554,9 +2609,7 @@ document.getElementById('ex-date-lbl').textContent = fmtDateLabel(S.date);
 renderDash();
 updateSyncStatus();
 
-document.getElementById('daily-notes').addEventListener('blur', () => {
-  const log = getLog(S.date); log.notes = document.getElementById('daily-notes').value; saveLog(S.date, log);
-});
+
 
 </script>
 
