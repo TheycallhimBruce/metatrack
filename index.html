@@ -356,13 +356,26 @@ canvas{width:100%;height:200px}
   <div class="pw">
 
     <!-- HEADER -->
-    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
       <div style="font-size:24px;font-weight:800;letter-spacing:-.5px;color:var(--txt)">Meta<span style="color:var(--accl)">Track</span></div>
       <div style="text-align:right">
         <div id="dash-date-lbl" style="font-size:11px;color:var(--txt)">Today — Friday 24 April 2026</div>
         <input type="date" id="dash-date" onchange="changeDate(this.value)" style="font-size:11px;padding:2px 6px;margin-top:2px;width:130px;background:var(--sur2);border:0.5px solid var(--bdr);border-radius:6px;color:var(--txt)">
       </div>
     </div>
+    <div id="smart-greeting" style="font-size:13px;color:var(--txt2);margin-bottom:12px;padding:8px 12px;background:var(--sur2);border-radius:10px;border-left:3px solid var(--accl)"></div>
+    <script>
+    (function(){
+      var h=new Date().getHours(),g='',tip='';
+      if(h>=5&&h<12){g='Good morning, Keith 👋';tip='Start with your walk if you haven\'t — beach window is now.';}
+      else if(h>=12&&h<14){g='Good afternoon, Keith';tip='Good time to log lunch before you forget the details.';}
+      else if(h>=14&&h<18){g='Afternoon, Keith';tip='Workout window is open — check Today\'s Workout.';}
+      else if(h>=18&&h<21){g='Evening, Keith';tip='Don\'t forget to log dinner and check your protein for the day.';}
+      else{g='Late night, Keith';tip='Log anything you\'ve missed today, then rest up.';}
+      var el=document.getElementById('smart-greeting');
+      if(el)el.innerHTML='<strong>'+g+'</strong> &nbsp;·&nbsp; '+tip;
+    })();
+    </script>
 
     <!-- TODAY SUMMARY -->
     <div style="background:var(--sur);border:0.5px solid var(--bdr);border-radius:14px;padding:14px;margin-bottom:12px">
@@ -370,9 +383,9 @@ canvas{width:100%;height:200px}
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
         <div style="background:var(--sur2);border-radius:10px;padding:10px">
           <div style="font-size:10px;color:var(--txt);margin-bottom:3px">CAL IN</div>
-          <div class="mc-val mc-in" id="d-cals" style="font-size:20px;color:var(--err)">0</div>
+          <div class="mc-val mc-in" id="d-cals" style="font-size:20px;color:var(--info)">0</div>
           <div id="d-cals-goal" style="font-size:10px;color:var(--txt);margin-top:2px">Goal: 2000 kcal · 0%</div>
-          <div class="pbar" style="margin-top:6px"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
+          <div class="pbar" style="margin-top:6px"><div class="pbar-fill" id="d-cals-bar" style="background:var(--info);width:0%"></div></div>
         </div>
         <div style="background:var(--sur2);border-radius:10px;padding:10px">
           <div style="font-size:10px;color:var(--txt);margin-bottom:3px">BURNED</div>
@@ -481,7 +494,7 @@ canvas{width:100%;height:200px}
       </div>
     </div>
     <div class="grid g3">
-      <div class="card" style="text-align:center"><div class="mc-lbl">Total Calories</div><div style="font-size:28px;font-weight:800;color:var(--err)" id="ft-cals">0</div></div>
+      <div class="card" style="text-align:center"><div class="mc-lbl">Total Calories</div><div style="font-size:28px;font-weight:800;color:var(--info)" id="ft-cals">0</div></div>
       <div class="card" style="text-align:center"><div class="mc-lbl">Protein</div><div style="font-size:28px;font-weight:800;color:var(--acc)" id="ft-prot">0g</div></div>
       <div class="card" style="text-align:center"><div class="mc-lbl">Carbs / Fat</div><div style="font-size:20px;font-weight:700" id="ft-cf">0g / 0g</div></div>
     </div>
@@ -780,6 +793,7 @@ canvas{width:100%;height:200px}
   <div class="submenu-inner">
     <div class="submenu-item" onclick="showPage(&#39;body&#39;);closeAllSubmenus()" id="mob-body"><span class="nav-ic">⚖️</span>Body Stats</div>
     <div class="submenu-item" onclick="showPage(&#39;analytics&#39;);closeAllSubmenus()" id="mob-analytics"><span class="nav-ic">📊</span>Analytics</div>
+    <div class="submenu-item" onclick="showPage(&#39;claude&#39;);closeAllSubmenus()" id="mob-claude-more"><span class="nav-ic">🤖</span>Recipe Ideas</div>
     <div class="submenu-item" onclick="showPage(&#39;settings&#39;);closeAllSubmenus()" id="mob-settings"><span class="nav-ic">⚙️</span>Settings</div>
   </div>
 </div>
@@ -787,8 +801,8 @@ canvas{width:100%;height:200px}
 <nav id="mobile-nav">
   <div class="mob-nav-row">
     <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;);closeAllSubmenus()"><span class="nav-ic">🏠</span>Home</div>
+    <div class="mob-nav" id="mob-food-nav" onclick="showPage(&#39;food&#39;);closeAllSubmenus()"><span class="nav-ic">🍽</span>Food Log</div>
     <div class="mob-nav" id="mobbtn-train" onclick="toggleSubmenu(&#39;train&#39;)"><span class="nav-ic">🏋️</span>Train</div>
-    <div class="mob-nav" id="mobbtn-eat" onclick="toggleSubmenu(&#39;eat&#39;)"><span class="nav-ic">🍽</span>Eat</div>
     <div class="mob-nav" id="mobbtn-kitchen" onclick="toggleSubmenu(&#39;kitchen&#39;)"><span class="nav-ic">📦</span>Kitchen</div>
     <div class="mob-nav" id="mobbtn-more" onclick="toggleSubmenu(&#39;more&#39;)"><span class="nav-ic">•••</span>More</div>
   </div>
