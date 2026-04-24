@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_7.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_8.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -689,9 +689,9 @@ canvas{width:100%;height:200px}
   </div>
 
   <div class="modal-foot">
-    <button class="btn btn-ghost" onclick="closeModal(&#39;modal-food&#39;)">Cancel</button>
+    <button class="btn btn-ghost" id="food-cancel-btn" onclick="closeModal(&#39;modal-food&#39;)">Cancel</button>
     <button class="btn btn-pri" id="add-food-btn" onclick="addFoodEntry()" style="display:none">Add to Log</button>
-    <button class="btn btn-pri" id="add-manual-btn" onclick="addManualFood()">Add Food</button>
+    <button class="btn btn-pri" id="add-manual-btn" onclick="foodModalSubmit()">Add Food</button>
   </div>
 </div>
 </div>
@@ -1683,24 +1683,32 @@ function closeModal(id) {
 
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if(e.target===o) { o.classList.remove('open'); stopScanner(); } }));
 
+function foodModalSubmit() {
+  if (S.foodTab === 'quick') addQuickCalEntry();
+  else addManualFood();
+}
+
 function switchFoodTab(tab) {
   S.foodTab = tab;
-  document.querySelectorAll('#modal-food .tab').forEach((t,i) => t.classList.toggle('active', ['search','saved','quick','manual'][i]===tab));
+  document.querySelectorAll('#modal-food .tab').forEach((t,i) =>
+    t.classList.toggle('active', ['search','saved','quick','manual'][i]===tab));
   ['search','saved','quick','manual'].forEach(t => {
     const el = document.getElementById('ftab-'+t);
     if (el) el.style.display = t===tab ? '' : 'none';
   });
-  document.getElementById('add-manual-btn').style.display = tab==='manual' ? '' : 'none';
-  if (tab === 'manual') { document.getElementById('add-food-btn').style.display = 'none'; document.getElementById('food-confirm').style.display = 'none'; }
-  if (tab === 'saved') renderSavedMealsList();
-  if (tab === 'quick') {
-    document.getElementById('add-manual-btn').style.display = 'block';
-    document.getElementById('add-manual-btn').textContent = 'Log Quick Entry';
-    document.getElementById('add-manual-btn').onclick = addQuickCalEntry;
+  const submitBtn = document.getElementById('add-manual-btn');
+  if (tab === 'manual') {
+    submitBtn.style.display = '';
+    submitBtn.textContent = 'Add Food';
+    document.getElementById('add-food-btn').style.display = 'none';
+    document.getElementById('food-confirm').style.display = 'none';
+  } else if (tab === 'quick') {
+    submitBtn.style.display = '';
+    submitBtn.textContent = 'Log Quick Entry';
   } else {
-    document.getElementById('add-manual-btn').textContent = 'Add Food';
-    document.getElementById('add-manual-btn').onclick = addManualFood;
+    submitBtn.style.display = 'none';
   }
+  if (tab === 'saved') renderSavedMealsList();
 }
 
 
