@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)file:///C:/Users/Keith/Downloads/MetaTrack_v5_10.html -->
+<!-- saved from url=(0053)file:///C:/Users/Keith/Downloads/MetaTrack_v5_11.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -640,11 +640,41 @@ canvas{width:100%;height:200px}
 
   <!-- SAVED MEALS TAB -->
   <div id="ftab-saved" style="display:none">
-    <div id="saved-meals-list"></div>
-    <div class="empty" id="saved-meals-empty" style="display:none">
-      <div class="ei">⭐</div>
-      <div class="et">No saved meals yet</div>
-      <div style="font-size:12px;color:var(--txt3);margin-top:6px">Log a meal then tap "Save as Meal" to store it here</div>
+    <div id="saved-meals-view">
+      <div id="saved-meals-list"></div>
+      <div class="empty" id="saved-meals-empty" style="display:none">
+        <div class="ei">⭐</div>
+        <div class="et">No saved meals yet</div>
+        <div style="font-size:12px;color:var(--txt3);margin-top:6px">Tap "Create Meal" to build one</div>
+      </div>
+      <button class="btn btn-ghost" style="width:100%;margin-top:10px" onclick="showCreateMeal()">+ Create New Meal</button>
+    </div>
+    <div id="saved-meals-builder" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <button onclick="hideCreateMeal()" style="background:none;border:none;color:var(--txt2);font-size:20px;cursor:pointer;padding:0">←</button>
+        <span style="font-weight:700;font-size:15px">Create Meal</span>
+      </div>
+      <div class="frow"><label>Meal Name</label><input type="text" id="builder-meal-name" placeholder="e.g. Oat Breakfast, Chicken Bowl"></div>
+      <div style="font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Ingredients</div>
+      <div id="builder-ingredients-list" style="margin-bottom:10px"></div>
+      <div style="background:var(--sur2);border:0.5px solid var(--bdr2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:8px">Add Ingredient</div>
+        <input type="text" id="builder-ing-name" placeholder="Food name" style="margin-bottom:6px">
+        <div class="fgrid fc2" style="margin-bottom:6px">
+          <input type="number" id="builder-ing-qty" placeholder="Qty (e.g. 60)">
+          <select id="builder-ing-unit"><option>g</option><option>ml</option><option>cup</option><option>tbsp</option><option>tsp</option><option>piece</option><option>serve</option></select>
+        </div>
+        <div class="fgrid fc2" style="margin-bottom:6px">
+          <input type="number" id="builder-ing-cals" placeholder="Calories">
+          <input type="number" id="builder-ing-prot" placeholder="Protein (g)">
+        </div>
+        <div class="fgrid fc2" style="margin-bottom:8px">
+          <input type="number" id="builder-ing-carbs" placeholder="Carbs (g)">
+          <input type="number" id="builder-ing-fat" placeholder="Fat (g)">
+        </div>
+        <button class="btn btn-ghost btn-sm" style="width:100%" onclick="addBuilderIngredient()">+ Add to Meal</button>
+      </div>
+      <div id="builder-totals" style="font-size:12px;color:var(--txt2);margin-bottom:4px"></div>
     </div>
   </div>
 
@@ -1685,6 +1715,7 @@ document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e
 
 function foodModalSubmit() {
   if (S.foodTab === 'quick') addQuickCalEntry();
+  else if (S.foodTab === 'builder') saveBuilderMeal();
   else addManualFood();
 }
 
@@ -1708,7 +1739,7 @@ function switchFoodTab(tab) {
   } else {
     submitBtn.style.display = 'none';
   }
-  if (tab === 'saved') renderSavedMealsList();
+  if (tab === 'saved') { hideCreateMeal(); renderSavedMealsList(); }
 }
 
 
@@ -2135,6 +2166,95 @@ function addQuickCalEntry() {
   renderFoodPage(); renderDash();
   toast(`${name} logged — ${cals} kcal ✓`);
   scheduleSync();
+}
+
+
+// ── MEAL BUILDER ─────────────────────────────────────────
+let builderIngredients = [];
+
+function showCreateMeal() {
+  builderIngredients = [];
+  document.getElementById('builder-meal-name').value = '';
+  document.getElementById('saved-meals-view').style.display = 'none';
+  document.getElementById('saved-meals-builder').style.display = '';
+  updateBuilderList();
+  // Swap footer buttons
+  document.getElementById('add-manual-btn').style.display = '';
+  document.getElementById('add-manual-btn').textContent = 'Save Meal ⭐';
+  S.foodTab = 'builder';
+}
+
+function hideCreateMeal() {
+  document.getElementById('saved-meals-view').style.display = '';
+  document.getElementById('saved-meals-builder').style.display = 'none';
+  document.getElementById('add-manual-btn').style.display = 'none';
+  S.foodTab = 'saved';
+  renderSavedMealsList();
+}
+
+function addBuilderIngredient() {
+  const name = document.getElementById('builder-ing-name').value.trim();
+  if (!name) { toast('Enter ingredient name'); return; }
+  const ing = {
+    name,
+    qty: document.getElementById('builder-ing-qty').value || '',
+    unit: document.getElementById('builder-ing-unit').value,
+    calories: +document.getElementById('builder-ing-cals').value || 0,
+    protein: +document.getElementById('builder-ing-prot').value || 0,
+    carbs: +document.getElementById('builder-ing-carbs').value || 0,
+    fat: +document.getElementById('builder-ing-fat').value || 0
+  };
+  builderIngredients.push(ing);
+  // Clear fields
+  ['builder-ing-name','builder-ing-qty','builder-ing-cals','builder-ing-prot','builder-ing-carbs','builder-ing-fat'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  updateBuilderList();
+  toast(`${name} added to meal`);
+}
+
+function removeBuilderIngredient(i) {
+  builderIngredients.splice(i, 1);
+  updateBuilderList();
+}
+
+function updateBuilderList() {
+  const listEl = document.getElementById('builder-ingredients-list');
+  const totalsEl = document.getElementById('builder-totals');
+
+  if (!builderIngredients.length) {
+    listEl.innerHTML = '<div style="font-size:12px;color:var(--txt3);padding:6px 0;margin-bottom:4px">No ingredients yet</div>';
+    totalsEl.innerHTML = '';
+    return;
+  }
+
+  listEl.innerHTML = builderIngredients.map((ing, i) =>
+    `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:var(--sur2);border-radius:8px;margin-bottom:6px;gap:8px">
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:13px">${ing.name}</div>
+        <div style="font-size:11px;color:var(--txt2)">${ing.qty} ${ing.unit} · ${ing.calories} kcal · ${ing.protein}g prot</div>
+      </div>
+      <button onclick="removeBuilderIngredient(${i})" style="background:none;border:none;color:var(--err);font-size:16px;cursor:pointer;padding:4px">✕</button>
+    </div>`
+  ).join('');
+
+  const totalCals = Math.round(builderIngredients.reduce((s,i)=>s+i.calories,0));
+  const totalProt = builderIngredients.reduce((s,i)=>s+i.protein,0).toFixed(1);
+  const totalCarbs = builderIngredients.reduce((s,i)=>s+i.carbs,0).toFixed(1);
+  const totalFat = builderIngredients.reduce((s,i)=>s+i.fat,0).toFixed(1);
+  totalsEl.innerHTML = `<strong>Total:</strong> ${totalCals} kcal · ${totalProt}g protein · ${totalCarbs}g carbs · ${totalFat}g fat`;
+}
+
+function saveBuilderMeal() {
+  const name = document.getElementById('builder-meal-name').value.trim();
+  if (!name) { toast('Enter a meal name'); return; }
+  if (!builderIngredients.length) { toast('Add at least one ingredient'); return; }
+
+  const meals = getSavedMeals();
+  meals[name] = { name, savedAt: today(), ingredients: builderIngredients };
+  saveSavedMeals(meals);
+  hideCreateMeal();
+  toast(`"${name}" saved ✓`);
 }
 
 // ── PANTRY BARCODE SCAN ──────────────────────────────────
