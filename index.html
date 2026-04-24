@@ -3263,9 +3263,10 @@ function toggleSubmenu(name) {
 }
 
 function closeAllSubmenus() {
-  ['train','eat','kitchen','more'].forEach(n => {
+  ['train','kitchen','more'].forEach(n => {
     document.getElementById('submenu-'+n)?.classList.remove('open');
-    document.getElementById('mobbtn-'+n).style.color = '';
+    const btn = document.getElementById('mobbtn-'+n);
+    if(btn) btn.style.color = '';
   });
   document.getElementById('submenu-backdrop').classList.remove('open');
 }
