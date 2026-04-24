@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_6.html -->
+<!-- saved from url=(0052)file:///C:/Users/Keith/Downloads/MetaTrack_v5_7.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -306,6 +306,9 @@ canvas{width:100%;height:200px}
       <div class="card" style="text-align:center"><div class="mc-lbl">Total Calories</div><div style="font-size:28px;font-weight:800;color:var(--err)" id="ft-cals">0</div></div>
       <div class="card" style="text-align:center"><div class="mc-lbl">Protein</div><div style="font-size:28px;font-weight:800;color:var(--acc)" id="ft-prot">0g</div></div>
       <div class="card" style="text-align:center"><div class="mc-lbl">Carbs / Fat</div><div style="font-size:20px;font-weight:700" id="ft-cf">0g / 0g</div></div>
+    </div>
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn btn-ghost btn-sm" onclick="openSaveMealModal()" style="color:var(--warn)">⭐ Save Today's Food as Meal</button>
     </div>
   </div>
 </div>
@@ -619,6 +622,8 @@ canvas{width:100%;height:200px}
   <div class="modal-h"><h3>Add Food</h3><button class="modal-close" onclick="closeModal(&#39;modal-food&#39;)">✕</button></div>
   <div class="tabs">
     <div class="tab active" onclick="switchFoodTab(&#39;search&#39;)">🔍 Search</div>
+    <div class="tab" onclick="switchFoodTab(&#39;saved&#39;)">⭐ Saved</div>
+    <div class="tab" onclick="switchFoodTab(&#39;quick&#39;)">⚡ Quick</div>
     <div class="tab" onclick="switchFoodTab(&#39;manual&#39;)">✏️ Manual</div>
   </div>
 
@@ -632,7 +637,29 @@ canvas{width:100%;height:200px}
   </div>
 
 
+  <!-- SAVED MEALS TAB -->
+  <div id="ftab-saved" style="display:none">
+    <div id="saved-meals-list"></div>
+    <div class="empty" id="saved-meals-empty" style="display:none">
+      <div class="ei">⭐</div>
+      <div class="et">No saved meals yet</div>
+      <div style="font-size:12px;color:var(--txt3);margin-top:6px">Log a meal then tap "Save as Meal" to store it here</div>
+    </div>
+  </div>
+
+  <!-- QUICK CALORIE TAB -->
+  <div id="ftab-quick" style="display:none">
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:14px">For takeaways or anything where you just want to log calories quickly without full macro detail.</p>
+    <div class="frow"><label>Description</label><input type="text" id="q-name" placeholder="e.g. Maccas Quarter Pounder meal, Thai takeaway"></div>
+    <div class="fgrid fc2">
+      <div class="frow"><label>Calories (kcal)</label><input type="number" id="q-cals" placeholder="800"></div>
+      <div class="frow"><label>Meal</label><select id="q-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+    </div>
+    <div style="font-size:12px;color:var(--txt3);margin-bottom:12px">Tip: Google "[restaurant name] [meal] calories" for a quick estimate.</div>
+  </div>
+
   <!-- MANUAL TAB -->
+  <div id="ftab-manual" style="display:none">
   <div id="ftab-manual" style="display:none">
     <div class="frow"><label>Food Name</label><input type="text" id="f-name" placeholder="e.g. Chicken breast (cooked)"></div>
     <div class="fgrid fc2">
@@ -873,6 +900,51 @@ canvas{width:100%;height:200px}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
       <button onclick="preshopSkip()" style="padding:14px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">Skip</button>
       <button onclick="preshopNext()" style="padding:14px;background:var(--acc);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation" id="preshop-next-btn">Looks Good →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SAVE MEAL -->
+<div class="overlay" id="modal-save-meal">
+  <div class="modal">
+    <div class="modal-h"><h3>Save as Meal</h3><button class="modal-close" onclick="closeModal(&#39;modal-save-meal&#39;)">✕</button></div>
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:14px">Save today's logged food as a reusable meal template.</p>
+    <div class="frow"><label>Meal Name</label><input type="text" id="save-meal-name" placeholder="e.g. Oat Breakfast, Chicken Bowl"></div>
+    <div id="save-meal-preview" style="background:var(--sur2);border-radius:8px;padding:12px;font-size:12px;color:var(--txt2);max-height:160px;overflow-y:auto;margin-bottom:4px"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal(&#39;modal-save-meal&#39;)">Cancel</button>
+      <button class="btn btn-pri" onclick="saveMeal()">Save Meal ⭐</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: USE SAVED MEAL -->
+<div class="overlay" id="modal-use-meal">
+  <div class="modal">
+    <div class="modal-h"><h3 id="use-meal-title">Load Meal</h3><button class="modal-close" onclick="closeModal(&#39;modal-use-meal&#39;)">✕</button></div>
+    <div id="use-meal-ingredients" style="background:var(--sur2);border-radius:8px;padding:12px;font-size:13px;margin-bottom:14px;max-height:200px;overflow-y:auto"></div>
+    <div class="frow">
+      <label>Portion size</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <input type="range" id="meal-portion" min="0.25" max="2" step="0.25" value="1" oninput="updatePortionPreview()" style="flex:1">
+        <span id="portion-label" style="font-weight:700;font-size:16px;min-width:36px;text-align:center">1×</span>
+      </div>
+    </div>
+    <div id="portion-preview" style="display:flex;gap:16px;margin-bottom:4px;font-size:13px">
+      <span style="color:var(--err)" id="pp-cals">0 kcal</span>
+      <span style="color:var(--acc)" id="pp-prot">0g protein</span>
+      <span style="color:var(--info)" id="pp-carbs">0g carbs</span>
+      <span style="color:var(--warn)" id="pp-fat">0g fat</span>
+    </div>
+    <div class="frow" style="margin-top:10px"><label>Meal slot</label>
+      <select id="use-meal-slot">
+        <option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option>
+      </select>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-err btn-sm" onclick="deleteSavedMeal()" style="margin-right:auto">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal(&#39;modal-use-meal&#39;)">Cancel</button>
+      <button class="btn btn-pri" onclick="logSavedMeal()">Log Meal ✓</button>
     </div>
   </div>
 </div>
@@ -1613,11 +1685,22 @@ document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e
 
 function switchFoodTab(tab) {
   S.foodTab = tab;
-  document.querySelectorAll('#modal-food .tab').forEach((t,i) => t.classList.toggle('active', ['search','manual'][i]===tab));
-  document.getElementById('ftab-search').style.display = tab==='search' ? '' : 'none';
-  document.getElementById('ftab-manual').style.display = tab==='manual' ? '' : 'none';
+  document.querySelectorAll('#modal-food .tab').forEach((t,i) => t.classList.toggle('active', ['search','saved','quick','manual'][i]===tab));
+  ['search','saved','quick','manual'].forEach(t => {
+    const el = document.getElementById('ftab-'+t);
+    if (el) el.style.display = t===tab ? '' : 'none';
+  });
   document.getElementById('add-manual-btn').style.display = tab==='manual' ? '' : 'none';
   if (tab === 'manual') { document.getElementById('add-food-btn').style.display = 'none'; document.getElementById('food-confirm').style.display = 'none'; }
+  if (tab === 'saved') renderSavedMealsList();
+  if (tab === 'quick') {
+    document.getElementById('add-manual-btn').style.display = 'block';
+    document.getElementById('add-manual-btn').textContent = 'Log Quick Entry';
+    document.getElementById('add-manual-btn').onclick = addQuickCalEntry;
+  } else {
+    document.getElementById('add-manual-btn').textContent = 'Add Food';
+    document.getElementById('add-manual-btn').onclick = addManualFood;
+  }
 }
 
 
@@ -1868,6 +1951,183 @@ function fmtDur(ms) {
     : `${String(m).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 }
 
+
+
+// ── SAVED MEALS ──────────────────────────────────────────
+
+function getSavedMeals() { return DB.read('savedMeals') || {}; }
+function saveSavedMeals(meals) { DB.set('savedMeals', meals); }
+
+let _currentSavedMeal = null;
+let _currentMealKey = null;
+
+function openSaveMealModal() {
+  const log = getLog(S.date);
+  const foods = log.foods || [];
+  if (!foods.length) { toast('No food logged today to save'); return; }
+
+  const preview = document.getElementById('save-meal-preview');
+  const totalCals = Math.round(foods.reduce((s,f)=>s+(+f.calories||0),0));
+  const totalProt = Math.round(foods.reduce((s,f)=>s+(+f.protein||0),0));
+  preview.innerHTML = foods.map(f =>
+    `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:0.5px solid var(--bdr)">
+      <span>${f.name} ${f.qty||''} ${f.unit||''}</span>
+      <span style="color:var(--err)">${Math.round(f.calories||0)} kcal</span>
+    </div>`
+  ).join('') + `<div style="margin-top:8px;font-weight:700">Total: ${totalCals} kcal · ${totalProt}g protein</div>`;
+
+  document.getElementById('save-meal-name').value = '';
+  openModal('modal-save-meal');
+}
+
+function saveMeal() {
+  const name = document.getElementById('save-meal-name').value.trim();
+  if (!name) { toast('Enter a meal name'); return; }
+  const log = getLog(S.date);
+  const foods = log.foods || [];
+  if (!foods.length) { toast('No food to save'); return; }
+
+  const meals = getSavedMeals();
+  meals[name] = {
+    name,
+    savedAt: today(),
+    ingredients: foods.map(f => ({
+      name: f.name, qty: f.qty, unit: f.unit,
+      calories: f.calories, protein: f.protein,
+      carbs: f.carbs, fat: f.fat
+    }))
+  };
+  saveSavedMeals(meals);
+  closeModal('modal-save-meal');
+  toast(`"${name}" saved ✓`);
+}
+
+function renderSavedMealsList() {
+  const meals = getSavedMeals();
+  const keys = Object.keys(meals);
+  const listEl = document.getElementById('saved-meals-list');
+  const emptyEl = document.getElementById('saved-meals-empty');
+
+  if (!keys.length) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = keys.map(key => {
+    const meal = meals[key];
+    const cals = Math.round(meal.ingredients.reduce((s,i)=>s+(+i.calories||0),0));
+    const prot = Math.round(meal.ingredients.reduce((s,i)=>s+(+i.protein||0),0));
+    return `<div onclick="openUseMealModal('${key.replace(/'/g,"\'")}')"
+      style="background:var(--sur2);border:0.5px solid var(--bdr2);border-radius:10px;padding:14px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:2px">${meal.name}</div>
+        <div style="font-size:12px;color:var(--txt2)">${meal.ingredients.length} ingredients · ${cals} kcal · ${prot}g protein</div>
+      </div>
+      <span style="font-size:20px">→</span>
+    </div>`;
+  }).join('');
+}
+
+function openUseMealModal(key) {
+  const meals = getSavedMeals();
+  const meal = meals[key];
+  if (!meal) return;
+
+  _currentMealKey = key;
+  _currentSavedMeal = meal;
+
+  document.getElementById('use-meal-title').textContent = meal.name;
+  document.getElementById('meal-portion').value = 1;
+  document.getElementById('portion-label').textContent = '1×';
+
+  const ingEl = document.getElementById('use-meal-ingredients');
+  ingEl.innerHTML = meal.ingredients.map(i =>
+    `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid var(--bdr)">
+      <span>${i.name}</span>
+      <span style="color:var(--txt2)">${i.qty||''} ${i.unit||''}</span>
+    </div>`
+  ).join('');
+
+  updatePortionPreview();
+  closeModal('modal-food');
+  openModal('modal-use-meal');
+}
+
+function updatePortionPreview() {
+  const portion = parseFloat(document.getElementById('meal-portion').value) || 1;
+  document.getElementById('portion-label').textContent = portion + '×';
+  if (!_currentSavedMeal) return;
+  const ingredients = _currentSavedMeal.ingredients;
+  const cals = Math.round(ingredients.reduce((s,i)=>s+(+i.calories||0),0) * portion);
+  const prot = (ingredients.reduce((s,i)=>s+(+i.protein||0),0) * portion).toFixed(1);
+  const carbs = (ingredients.reduce((s,i)=>s+(+i.carbs||0),0) * portion).toFixed(1);
+  const fat = (ingredients.reduce((s,i)=>s+(+i.fat||0),0) * portion).toFixed(1);
+  document.getElementById('pp-cals').textContent = cals + ' kcal';
+  document.getElementById('pp-prot').textContent = prot + 'g protein';
+  document.getElementById('pp-carbs').textContent = carbs + 'g carbs';
+  document.getElementById('pp-fat').textContent = fat + 'g fat';
+}
+
+function logSavedMeal() {
+  if (!_currentSavedMeal) return;
+  const portion = parseFloat(document.getElementById('meal-portion').value) || 1;
+  const slot = document.getElementById('use-meal-slot').value;
+  const log = getLog(S.date);
+  log.foods = log.foods || [];
+
+  _currentSavedMeal.ingredients.forEach(i => {
+    log.foods.push({
+      name: i.name,
+      meal: slot,
+      qty: Math.round((parseFloat(i.qty)||1) * portion * 10) / 10,
+      unit: i.unit || 'g',
+      calories: Math.round((+i.calories||0) * portion),
+      protein: +((+i.protein||0) * portion).toFixed(1),
+      carbs: +((+i.carbs||0) * portion).toFixed(1),
+      fat: +((+i.fat||0) * portion).toFixed(1)
+    });
+  });
+
+  saveLog(S.date, log);
+  closeModal('modal-use-meal');
+  renderFoodPage(); renderDash();
+  const cals = Math.round(_currentSavedMeal.ingredients.reduce((s,i)=>s+(+i.calories||0),0) * portion);
+  toast(`${_currentSavedMeal.name} logged — ${cals} kcal ✓`);
+  scheduleSync();
+  _currentSavedMeal = null; _currentMealKey = null;
+}
+
+function deleteSavedMeal() {
+  if (!_currentMealKey) return;
+  if (!confirm(`Delete "${_currentMealKey}"?`)) return;
+  const meals = getSavedMeals();
+  delete meals[_currentMealKey];
+  saveSavedMeals(meals);
+  closeModal('modal-use-meal');
+  toast('Meal deleted');
+}
+
+// ── QUICK CALORIE ENTRY ───────────────────────────────────
+function addQuickCalEntry() {
+  const name = document.getElementById('q-name').value.trim();
+  const cals = +document.getElementById('q-cals').value;
+  if (!name || !cals) { toast('Enter a name and calories'); return; }
+
+  const entry = {
+    name, meal: document.getElementById('q-meal').value,
+    qty: 1, unit: 'serve',
+    calories: cals, protein: 0, carbs: 0, fat: 0,
+    notes: 'Quick entry'
+  };
+  const log = getLog(S.date);
+  (log.foods = log.foods||[]).push(entry);
+  saveLog(S.date, log);
+  closeModal('modal-food');
+  renderFoodPage(); renderDash();
+  toast(`${name} logged — ${cals} kcal ✓`);
+  scheduleSync();
+}
 
 // ── PANTRY BARCODE SCAN ──────────────────────────────────
 let pantryScanner = null;
@@ -2638,4 +2898,4 @@ updateSyncStatus();
 
 </script>
 
-</body></html>
+</div></body></html>
