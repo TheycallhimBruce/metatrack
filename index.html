@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)file:///C:/Users/Keith/Downloads/MetaTrack_v5_10.html -->
+<!-- saved from url=(0050)file:///C:/Users/Keith/Downloads/MetaTrack_v5.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -138,8 +138,9 @@ canvas{width:100%;height:200px}
   <div class="sb-sec">
     <div class="sb-lbl">Track</div>
     <div class="nav active" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span> Dashboard</div>
+    <div class="nav" onclick="showPage(&#39;workout&#39;)"><span class="nav-ic">🏋️</span> Today's Workout</div>
     <div class="nav" onclick="showPage(&#39;food&#39;)"><span class="nav-ic">🍽</span> Food Log</div>
-    <div class="nav" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span> Exercise</div>
+    <div class="nav" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span> Exercise Log</div>
     <div class="nav" onclick="showPage(&#39;body&#39;)"><span class="nav-ic">⚖️</span> Body Stats</div>
   </div>
   <div class="sb-sec">
@@ -170,7 +171,7 @@ canvas{width:100%;height:200px}
     <div class="ph">
       <div class="ph-l">
         <div class="pt" id="dash-title">Today</div>
-        <div class="ps" id="dash-date-lbl">Today — Thursday 23 April 2026</div>
+        <div class="ps" id="dash-date-lbl">Today — Friday 24 April 2026</div>
       </div>
       <div class="ph-r">
         <input type="date" id="dash-date" style="width:160px" onchange="changeDate(this.value)">
@@ -179,10 +180,10 @@ canvas{width:100%;height:200px}
     <div class="grid dash-grid" style="margin-bottom:12px">
       <div class="mc mc-in">
         <div class="mc-lbl">Cal In</div>
-        <div class="mc-val" id="d-cals">2000</div>
+        <div class="mc-val" id="d-cals">0</div>
         <div class="mc-unit">kcal</div>
-        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 100%</div>
-        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background: var(--err); width: 100%;"></div></div>
+        <div id="d-cals-goal" style="font-size:10px;color:var(--txt3);margin-top:2px">Goal: 2000 kcal · 0%</div>
+        <div class="pbar"><div class="pbar-fill" id="d-cals-bar" style="background:var(--err);width:0%"></div></div>
       </div>
       <div class="mc mc-burn">
         <div class="mc-lbl">Burned</div>
@@ -191,7 +192,7 @@ canvas{width:100%;height:200px}
       </div>
       <div class="mc mc-net">
         <div class="mc-lbl">Net</div>
-        <div class="mc-val" id="d-net">2000</div>
+        <div class="mc-val" id="d-net">0</div>
         <div class="mc-unit">kcal</div>
       </div>
     </div>
@@ -216,7 +217,7 @@ canvas{width:100%;height:200px}
           <span class="ct">Today's Food</span>
           <button class="btn btn-pri btn-sm" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button>
         </div>
-        <div id="dash-food-list"><div class="sr"><span class="sr-l">Meal — test</span><span class="sr-v" style="color:var(--err)">0 kcal</span></div><div class="sr"><span class="sr-l">Meal — blob</span><span class="sr-v" style="color:var(--err)">2000 kcal</span></div></div>
+        <div id="dash-food-list"><div class="empty"><div class="et">Nothing logged yet</div></div></div>
       </div>
       <div class="card">
         <div class="ch">
@@ -243,7 +244,7 @@ canvas{width:100%;height:200px}
 <div class="page" id="page-food">
   <div class="pw">
     <div class="ph">
-      <div class="ph-l"><div class="pt">Food Log</div><div class="ps" id="food-date-lbl">Today — Thursday 23 April 2026</div></div>
+      <div class="ph-l"><div class="pt">Food Log</div><div class="ps" id="food-date-lbl">Today — Friday 24 April 2026</div></div>
       <div class="ph-r"><button class="btn btn-pri" onclick="openModal(&#39;modal-food&#39;)">+ Add Food</button></div>
     </div>
     <div class="card" style="margin-bottom:14px">
@@ -266,7 +267,7 @@ canvas{width:100%;height:200px}
 <div class="page" id="page-exercise">
   <div class="pw">
     <div class="ph">
-      <div class="ph-l"><div class="pt">Exercise Log</div><div class="ps" id="ex-date-lbl">Today — Thursday 23 April 2026</div></div>
+      <div class="ph-l"><div class="pt">Exercise Log</div><div class="ps" id="ex-date-lbl">Today — Friday 24 April 2026</div></div>
       <div class="ph-r">
         <button class="btn btn-ok" onclick="startSession()">🚶 Start Walk/Wade</button>
         <button class="btn btn-pri" onclick="openModal(&#39;modal-exercise&#39;)">+ Log Exercise</button>
@@ -433,6 +434,55 @@ canvas{width:100%;height:200px}
 
 </div><!-- /main -->
 
+<!-- WORKOUT -->
+<div class="page" id="page-workout">
+  <div class="pw">
+    <div class="ph">
+      <div class="ph-l">
+        <div class="pt" id="workout-title">Today's Workout</div>
+        <div class="ps" id="workout-subtitle">Loading...</div>
+      </div>
+      <div class="ph-r">
+        <button class="btn btn-ghost btn-sm" onclick="loadTodayWorkout()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- SESSION TIMER CARD -->
+    <div class="card" style="margin-bottom:14px" id="workout-timer-card">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">SESSION TIMER</div>
+          <div id="workout-timer" style="font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ok)">00:00</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:var(--txt2);margin-bottom:4px">CALORIES</div>
+          <div id="workout-cals" style="font-size:36px;font-weight:800;color:var(--err)">0</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+        <button id="workout-start-btn" onclick="toggleWorkoutTimer()" style="padding:14px;background:var(--ok);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">▶ Start Session</button>
+        <button onclick="finishWorkout()" style="padding:14px;background:var(--errbg);color:var(--err);border:1px solid var(--err);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">⏹ Finish</button>
+      </div>
+    </div>
+
+    <!-- EXERCISE LIST -->
+    <div id="workout-exercise-list"></div>
+
+    <!-- NO PROGRAM STATE -->
+    <div id="workout-no-program" style="display:none">
+      <div class="card">
+        <div class="empty">
+          <div class="ei">🏋️</div>
+          <div class="et" style="margin-bottom:12px">Program not set up yet</div>
+          <div style="font-size:13px;color:var(--txt3);margin-bottom:16px">Add the Weekly Schedule and Programs tabs to your Google Sheet then sync.</div>
+          <button class="btn btn-pri" onclick="showPage(&#39;settings&#39;)">Go to Settings</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- CLAUDE -->
 <div class="page" id="page-claude">
   <div class="pw">
@@ -474,8 +524,9 @@ canvas{width:100%;height:200px}
 <!-- MOBILE NAV -->
 <nav id="mobile-nav">
   <div class="mob-nav active" id="mob-dash" onclick="showPage(&#39;dashboard&#39;)"><span class="nav-ic">🏠</span>Home</div>
+  <div class="mob-nav" id="mob-workout" onclick="showPage(&#39;workout&#39;)"><span class="nav-ic">🏋️</span>Workout</div>
   <div class="mob-nav" id="mob-food" onclick="showPage(&#39;food&#39;)"><span class="nav-ic">🍽</span>Food</div>
-  <div class="mob-nav" id="mob-exercise" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span>Train</div>
+  <div class="mob-nav" id="mob-exercise" onclick="showPage(&#39;exercise&#39;)"><span class="nav-ic">💪</span>Log</div>
   <div class="mob-nav" id="mob-pantry" onclick="showPage(&#39;pantry&#39;)"><span class="nav-ic">📦</span>Pantry</div>
   <div class="mob-nav" id="mob-shopping" onclick="showPage(&#39;shopping&#39;)"><span class="nav-ic">🛒</span>Shop</div>
   <div class="mob-nav" onclick="startSession()" style="color:var(--ok)"><span class="nav-ic">🚶</span>Walk</div>
@@ -682,6 +733,18 @@ canvas{width:100%;height:200px}
   </div>
 </div>
 
+<!-- MODAL: WORKOUT SUMMARY -->
+<div class="overlay" id="modal-workout-summary">
+  <div class="modal">
+    <div class="modal-h"><h3>Session Complete 💪</h3><button class="modal-close" onclick="closeModal(&#39;modal-workout-summary&#39;)">✕</button></div>
+    <div id="workout-summary-content"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px">
+      <button onclick="closeModal(&#39;modal-workout-summary&#39;)" style="padding:14px;background:var(--sur2);color:var(--txt);border:1px solid var(--bdr2);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">Discard</button>
+      <button onclick="logWorkoutSession()" style="padding:14px;background:var(--acc);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation">Log Session ✓</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: PANTRY BARCODE SCAN -->
 <div class="overlay" id="modal-pantry-scan">
   <div class="modal">
@@ -770,7 +833,7 @@ function showPage(name) {
   document.getElementById('mob-'+name)?.classList.add('active');
   stopScanner();
   const renders = { dashboard: renderDash, food: renderFoodPage, exercise: renderExPage,
-    pantry: renderPantry, shopping: renderShopping, body: renderBodyPage, analytics: renderAnalytics, settings: loadSettings, claude: renderClaudePage };
+    pantry: renderPantry, shopping: renderShopping, body: renderBodyPage, analytics: renderAnalytics, settings: loadSettings, claude: renderClaudePage, workout: renderWorkoutPage };
   // Ensure settings goals are loaded for progress bars
   if (name === 'dashboard') setTimeout(renderDash, 50);
   renders[name]?.();
@@ -1963,6 +2026,364 @@ function preshopSkip() {
   }
 }
 
+
+
+// ── TODAY'S WORKOUT ──────────────────────────────────────
+
+let workoutState = {
+  running: false,
+  startTime: null,
+  elapsed: 0,
+  interval: null,
+  exercises: [],
+  dayType: ''
+};
+
+function renderWorkoutPage() {
+  loadTodayWorkout();
+}
+
+async function loadTodayWorkout() {
+  document.getElementById('workout-subtitle').textContent = 'Loading...';
+  document.getElementById('workout-exercise-list').innerHTML = '';
+  document.getElementById('workout-no-program').style.display = 'none';
+
+  const url = DB.read('syncUrl');
+  if (!url) {
+    // Use built-in program from localStorage if no Sheets connection
+    showBuiltInWorkout();
+    return;
+  }
+
+  try {
+    const r = await fetch(url + '?action=getTodayWorkout');
+    const data = await r.json();
+    if (data.status === 'ok' && data.workout && data.workout.exercises) {
+      renderWorkout(data.workout);
+    } else {
+      showBuiltInWorkout();
+    }
+  } catch(e) {
+    showBuiltInWorkout();
+  }
+}
+
+function showBuiltInWorkout() {
+  // Built-in program as fallback (matches the Sheets program)
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const schedule = { Monday:'Pull', Tuesday:'Active Recovery', Wednesday:'Push',
+    Thursday:'Active Recovery', Friday:'Pull', Saturday:'Light Activity', Sunday:'Recovery' };
+  const todayName = days[new Date().getDay()];
+  const dayType = schedule[todayName] || 'Recovery';
+
+  const exercises = {
+    'Pull': [
+      { order:1, name:'Ring Pull-Ups (or Ring Rows)', category:'Strength', sets:2, reps:'5-8', rir:'1-3', met:5.0, notes:'Band-assisted if needed' },
+      { order:2, name:'Ring Rows', category:'Strength', sets:2, reps:'8-12', rir:'1-3', met:4.5, notes:'Adjust foot position for difficulty' },
+      { order:3, name:'Band Pull-Aparts', category:'Rehab/Posture', sets:3, reps:'15-20', rir:'0', met:2.5, notes:'Shoulder retraction. Controlled tempo.' },
+      { order:4, name:'Neck Band Resistance', category:'Rehab/Posture', sets:3, reps:'12-15', rir:'0', met:2.0, notes:'C7 work. Cervical extensor strengthening.' },
+      { order:5, name:'Hip Band Distraction', category:'Rehab/Posture', sets:2, reps:'10 each side', rir:'0', met:2.0, notes:'Anterior hip. Pelvic tilt correction.' }
+    ],
+    'Push': [
+      { order:1, name:'Ring Push-Ups', category:'Strength', sets:2, reps:'8-12', rir:'1-3', met:4.5, notes:'Feet elevated for more difficulty' },
+      { order:2, name:'Ring Dips (or Negative Dips)', category:'Strength', sets:2, reps:'5-8', rir:'1-3', met:5.0, notes:'Negatives if full dips not yet possible' },
+      { order:3, name:'Band Tricep Pushdowns', category:'Strength', sets:2, reps:'12-15', rir:'1-3', met:3.5, notes:'Optional. Elbow health focus.' },
+      { order:4, name:'Band Pull-Aparts', category:'Rehab/Posture', sets:3, reps:'15-20', rir:'0', met:2.5, notes:'Every session.' },
+      { order:5, name:'Neck Band Resistance', category:'Rehab/Posture', sets:3, reps:'12-15', rir:'0', met:2.0, notes:'C7 work.' },
+      { order:6, name:'Hip Band Distraction', category:'Rehab/Posture', sets:2, reps:'10 each side', rir:'0', met:2.0, notes:'Pelvic tilt correction.' }
+    ],
+    'Active Recovery': [
+      { order:1, name:'Beach Walk', category:'Cardio', sets:1, reps:'30-45 min', rir:'0', met:3.8, notes:'Goal: 6,000-9,000 steps' },
+      { order:2, name:'Ocean Wading', category:'Cardio', sets:1, reps:'20 min', rir:'0', met:5.5, notes:'Forward, sideways, backward. 2-3x/week.' }
+    ],
+    'Light Activity': [
+      { order:1, name:'Walk or Rest', category:'Cardio', sets:1, reps:'20-40 min', rir:'0', met:3.0, notes:'Easy pace. No pressure.' }
+    ],
+    'Recovery': [
+      { order:1, name:'Rest or Light Walk', category:'Cardio', sets:1, reps:'20-30 min', rir:'0', met:2.5, notes:'Full recovery day.' }
+    ]
+  };
+
+  renderWorkout({ day: todayName, dayType, exercises: exercises[dayType] || [] });
+}
+
+function renderWorkout(workout) {
+  workoutState.exercises = workout.exercises || [];
+  workoutState.dayType = workout.dayType || '';
+
+  document.getElementById('workout-title').textContent = workout.day + ' — ' + workout.dayType;
+  document.getElementById('workout-subtitle').textContent = workout.exercises.length + ' exercises';
+  document.getElementById('workout-timer-card').style.display = 'block';
+  document.getElementById('workout-no-program').style.display = 'none';
+
+  const list = document.getElementById('workout-exercise-list');
+
+  // Group by category
+  const strength = workout.exercises.filter(e => e.category === 'Strength');
+  const rehab = workout.exercises.filter(e => e.category === 'Rehab/Posture');
+  const cardio = workout.exercises.filter(e => e.category === 'Cardio');
+
+  let html = '';
+
+  if (strength.length) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px">Strength</div>';
+    html += strength.map((ex, i) => exerciseCard(ex, 'strength_'+i)).join('');
+  }
+  if (rehab.length) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--ok);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px">Rehab / Posture</div>';
+    html += rehab.map((ex, i) => exerciseCard(ex, 'rehab_'+i)).join('');
+  }
+  if (cardio.length) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--info);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px">Cardio / Activity</div>';
+    html += cardio.map((ex, i) => exerciseCard(ex, 'cardio_'+i)).join('');
+  }
+
+  list.innerHTML = html;
+}
+
+function exerciseCard(ex, id) {
+  const rirText = ex.rir && ex.rir !== '0' ? ` · ${ex.rir} RIR` : '';
+  return `
+  <div class="card" style="margin-bottom:10px;border-left:3px solid ${ex.category==='Strength'?'var(--acc)':ex.category==='Rehab/Posture'?'var(--ok)':'var(--info)'}" id="ex-card-${id}">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">${ex.name}</div>
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:6px">${ex.sets} sets × ${ex.reps}${rirText}</div>
+        ${ex.notes ? `<div style="font-size:11px;color:var(--txt3)">${ex.notes}</div>` : ''}
+      </div>
+      <button onclick="toggleExerciseDone('${id}')" id="ex-btn-${id}"
+        style="flex-shrink:0;width:44px;height:44px;border-radius:50%;border:2px solid var(--bdr2);background:var(--sur2);font-size:20px;cursor:pointer;touch-action:manipulation;transition:all .2s">
+        ○
+      </button>
+    </div>
+    <div id="ex-feedback-${id}" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr)">
+      <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+        <button onclick="setExStatus('${id}','done')" class="ex-status-btn" id="exs-done-${id}"
+          style="padding:6px 12px;border-radius:8px;border:1px solid var(--ok);background:var(--okbg);color:var(--ok);font-size:12px;font-weight:600;cursor:pointer">
+          ✓ Done
+        </button>
+        <button onclick="setExStatus('${id}','modified')" class="ex-status-btn" id="exs-mod-${id}"
+          style="padding:6px 12px;border-radius:8px;border:1px solid var(--bdr2);background:var(--sur2);color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer">
+          ↻ Modified
+        </button>
+        <button onclick="setExStatus('${id}','skipped')" class="ex-status-btn" id="exs-skip-${id}"
+          style="padding:6px 12px;border-radius:8px;border:1px solid var(--bdr2);background:var(--sur2);color:var(--txt2);font-size:12px;font-weight:600;cursor:pointer">
+          ✕ Skipped
+        </button>
+      </div>
+      <input type="text" id="ex-note-${id}" placeholder="Notes (e.g. 3×8, felt strong, knee niggle...)"
+        style="font-size:12px;padding:8px 10px;width:100%">
+    </div>
+  </div>`;
+}
+
+function toggleExerciseDone(id) {
+  const btn = document.getElementById('ex-btn-'+id);
+  const feedback = document.getElementById('ex-feedback-'+id);
+  const card = document.getElementById('ex-card-'+id);
+  const isDone = btn.textContent === '✓';
+  if (isDone) {
+    btn.textContent = '○';
+    btn.style.background = 'var(--sur2)';
+    btn.style.borderColor = 'var(--bdr2)';
+    feedback.style.display = 'none';
+    card.style.opacity = '1';
+  } else {
+    btn.textContent = '✓';
+    btn.style.background = 'var(--ok)';
+    btn.style.borderColor = 'var(--ok)';
+    btn.style.color = '#fff';
+    feedback.style.display = 'block';
+    card.style.opacity = '1';
+    setExStatus(id, 'done');
+  }
+  updateWorkoutProgress();
+}
+
+function setExStatus(id, status) {
+  ['done','modified','skipped'].forEach(s => {
+    const btn = document.getElementById('exs-'+s.slice(0,3)+'-'+id) || document.getElementById('exs-mod-'+id);
+    if (!btn) return;
+  });
+  const colors = { done: 'var(--ok)', modified: 'var(--warn)', skipped: 'var(--err)' };
+  const bgs = { done: 'var(--okbg)', modified: 'var(--warnbg)', skipped: 'var(--errbg)' };
+  const ids = { done: 'done', modified: 'mod', skipped: 'skip' };
+  Object.keys(ids).forEach(s => {
+    const b = document.getElementById('exs-'+ids[s]+'-'+id);
+    if (!b) return;
+    if (s === status) {
+      b.style.background = bgs[s]; b.style.borderColor = colors[s]; b.style.color = colors[s];
+    } else {
+      b.style.background = 'var(--sur2)'; b.style.borderColor = 'var(--bdr2)'; b.style.color = 'var(--txt2)';
+    }
+  });
+  const card = document.getElementById('ex-card-'+id);
+  if (card && status === 'skipped') card.style.opacity = '0.5';
+  else if (card) card.style.opacity = '1';
+}
+
+function updateWorkoutProgress() {
+  const allBtns = document.querySelectorAll('[id^="ex-btn-"]');
+  const done = Array.from(allBtns).filter(b => b.textContent === '✓').length;
+  document.getElementById('workout-subtitle').textContent =
+    `${done} of ${allBtns.length} exercises done`;
+}
+
+// ── WORKOUT TIMER ────────────────────────────────────────
+function toggleWorkoutTimer() {
+  const btn = document.getElementById('workout-start-btn');
+  if (!workoutState.running) {
+    workoutState.running = true;
+    workoutState.startTime = Date.now() - (workoutState.elapsed * 1000);
+    workoutState.interval = setInterval(updateWorkoutTimer, 1000);
+    btn.textContent = '⏸ Pause';
+    btn.style.background = 'var(--warn)';
+  } else {
+    workoutState.running = false;
+    workoutState.elapsed = Math.floor((Date.now() - workoutState.startTime) / 1000);
+    clearInterval(workoutState.interval);
+    btn.textContent = '▶ Resume';
+    btn.style.background = 'var(--ok)';
+  }
+}
+
+function updateWorkoutTimer() {
+  if (!workoutState.running) return;
+  const elapsed = Math.floor((Date.now() - workoutState.startTime) / 1000);
+  const mins = Math.floor(elapsed / 60);
+  const secs = elapsed % 60;
+  document.getElementById('workout-timer').textContent =
+    String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+
+  // Calculate weighted MET burn
+  const exercises = workoutState.exercises;
+  if (exercises.length) {
+    const avgMet = exercises.reduce((s,e) => s + (parseFloat(e.met)||3), 0) / exercises.length;
+    const cals = Math.round((avgMet * 3.5 * getWeightKg()) / 200 * (elapsed/60));
+    document.getElementById('workout-cals').textContent = cals;
+  }
+}
+
+function finishWorkout() {
+  clearInterval(workoutState.interval);
+  workoutState.running = false;
+
+  const elapsed = workoutState.startTime
+    ? Math.floor((Date.now() - workoutState.startTime) / 1000)
+    : workoutState.elapsed;
+  const mins = Math.round(elapsed / 60);
+
+  // Gather exercise results
+  const allBtns = document.querySelectorAll('[id^="ex-btn-"]');
+  const completedExs = [];
+  allBtns.forEach(btn => {
+    const id = btn.id.replace('ex-btn-','');
+    const status = btn.textContent === '✓' ? 'done' :
+      document.getElementById('exs-skip-'+id)?.style.background?.includes('errbg') ? 'skipped' : 'pending';
+    const note = document.getElementById('ex-note-'+id)?.value || '';
+    const card = document.getElementById('ex-card-'+id);
+    const name = card?.querySelector('[style*="font-weight:700"]')?.textContent || '';
+    if (name) completedExs.push({ name, status, note });
+  });
+
+  const exercises = workoutState.exercises;
+  const avgMet = exercises.length
+    ? exercises.reduce((s,e) => s+(parseFloat(e.met)||3),0)/exercises.length : 3;
+  const caloriesBurned = Math.round((avgMet * 3.5 * getWeightKg()) / 200 * mins);
+  const doneCount = completedExs.filter(e => e.status === 'done').length;
+
+  // Show summary modal
+  document.getElementById('workout-summary-content').innerHTML = `
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:40px;font-weight:800;color:var(--ok)">${caloriesBurned}</div>
+      <div style="font-size:13px;color:var(--txt2)">kcal burned</div>
+    </div>
+    <div class="grid g2" style="margin-bottom:16px">
+      <div class="card" style="text-align:center"><div class="mc-lbl">Duration</div><div style="font-size:22px;font-weight:800">${mins} min</div></div>
+      <div class="card" style="text-align:center"><div class="mc-lbl">Completed</div><div style="font-size:22px;font-weight:800">${doneCount}/${completedExs.length}</div></div>
+    </div>
+    <div class="frow">
+      <label>Overall session feedback</label>
+      <select id="workout-feedback">
+        <option>Felt great — hit all targets</option>
+        <option>Good session — minor adjustments</option>
+        <option>Struggled — reduced load/reps</option>
+        <option>Partial session — ran out of time</option>
+        <option>Poor session — fatigue/pain</option>
+      </select>
+    </div>
+    <div class="frow">
+      <label>RPE (1-10 overall effort)</label>
+      <input type="number" id="workout-rpe" min="1" max="10" placeholder="7" value="7">
+    </div>
+    <div class="frow">
+      <label>Notes for trainer</label>
+      <textarea id="workout-notes" rows="3" placeholder="Anything to flag — niggles, what felt good, what was hard..."></textarea>
+    </div>
+  `;
+
+  // Store for logging
+  window._pendingWorkout = {
+    date: today(),
+    dayType: workoutState.dayType,
+    duration: mins,
+    caloriesBurned,
+    exercises: completedExs
+  };
+
+  openModal('modal-workout-summary');
+
+  // Reset timer
+  workoutState = { running:false, startTime:null, elapsed:0, interval:null,
+    exercises: workoutState.exercises, dayType: workoutState.dayType };
+  document.getElementById('workout-start-btn').textContent = '▶ Start Session';
+  document.getElementById('workout-start-btn').style.background = 'var(--ok)';
+  document.getElementById('workout-timer').textContent = '00:00';
+  document.getElementById('workout-cals').textContent = '0';
+}
+
+function logWorkoutSession() {
+  const pw = window._pendingWorkout;
+  if (!pw) { closeModal('modal-workout-summary'); return; }
+
+  const feedback = document.getElementById('workout-feedback').value;
+  const rpe = document.getElementById('workout-rpe').value;
+  const notes = document.getElementById('workout-notes').value;
+
+  // Log to exercise log
+  const log = getLog(pw.date);
+  log.exercises = log.exercises || [];
+
+  pw.exercises.filter(e => e.status !== 'skipped').forEach(e => {
+    log.exercises.push({
+      name: e.name, session: pw.dayType,
+      sets: '', reps: '', duration: '',
+      resistance: '', rpe: rpe,
+      notes: e.note || feedback,
+      posture: e.name.toLowerCase().includes('band') || e.name.toLowerCase().includes('neck') || e.name.toLowerCase().includes('hip'),
+      caloriesBurned: Math.round(pw.caloriesBurned / Math.max(pw.exercises.filter(e=>e.status!=='skipped').length, 1))
+    });
+  });
+
+  saveLog(pw.date, log);
+
+  // Sync session to sheets
+  const url = DB.read('syncUrl');
+  if (url) {
+    fetch(url, { method:'POST', body: JSON.stringify({
+      action:'logSession', date:pw.date, dayType:pw.dayType,
+      duration:pw.duration, caloriesBurned:pw.caloriesBurned,
+      exercisesCompleted:pw.exercises.filter(e=>e.status==='done').length + '/' + pw.exercises.length,
+      feedback, rpe, notes
+    })});
+    syncNow();
+  }
+
+  closeModal('modal-workout-summary');
+  renderDash();
+  toast('Session logged ✓');
+  window._pendingWorkout = null;
+}
 
 // ── CLAUDE PROMPT GENERATION ─────────────────────────────
 
