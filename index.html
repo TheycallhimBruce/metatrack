@@ -3158,9 +3158,9 @@ MY CONTEXT:
 - Minimal food waste — use what I have
 ${pref ? `- Tonight's preference: ${pref}` : ''}
 
-Please suggest ${count} recipes I can make using primarily what I have in my pantry. For each recipe include:
+Please suggest ${count} recipes I can make using primarily what I have in my pantry. It's okay if a recipe requires 1-2 ingredients I don't have — I can substitute or pick them up. For each recipe include:
 1. Recipe name
-2. Ingredients needed (with quantities) — flag anything not in my pantry
+2. Ingredients needed (with quantities) — flag anything not in my pantry and suggest substitutions if possible
 3. Estimated calories and protein per serve
 4. Brief cooking instructions (5-8 steps)
 5. Estimated cost per serve
@@ -3301,12 +3301,4 @@ function toast(msg) { const t=document.getElementById('toast'); t.textContent=ms
 S.date = today();
 document.getElementById('dash-date').value = S.date;
 document.getElementById('food-date-lbl').textContent = fmtDateLabel(S.date);
-document.getElementById('ex-date-lbl').textContent = fmtDateLabel(S.date);
-renderDash();
-updateSyncStatus();
-
-
-
-</script>
-
-</body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template
+document.getElementById('ex-date-lbl').textContent = fmtDateLabel(S.
