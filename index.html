@@ -1306,6 +1306,7 @@ async function searchFood() {
     const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=8&fields=product_name,brands,nutriments,serving_size,quantity&country=australia`;
     const r = await fetch(url);
     const data = await r.json();
+    console.log("API Response:", data); console.log("Product:", data.product); if(data.product) console.log("Product name:", data.product.product_name);
     const products = (data.products || []).filter(p => p.product_name && p.nutriments);
     if (!products.length) { el.innerHTML = '<div style="padding:16px;color:var(--txt3);text-align:center">No results — try a different search or use Manual entry</div>'; return; }
     el.innerHTML = products.map((p,i) => {
@@ -1495,6 +1496,7 @@ async function lookupBarcode(barcode) {
   try {
     const r = await fetch(`https://corsproxy.io/?https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
     const data = await r.json();
+    console.log("API Response:", data); console.log("Product:", data.product); if(data.product) console.log("Product name:", data.product.product_name);
     if (data.status !== 1 || !data.product) {
       document.getElementById('scan-result').innerHTML = `<div style="color:var(--warn);font-size:13px;padding:8px">Product not found in database. Try manual entry.</div>`;
       return;
@@ -1817,6 +1819,7 @@ async function testConnection() {
   try {
     const r = await fetch(url + '?action=ping');
     const data = await r.json();
+    console.log("API Response:", data); console.log("Product:", data.product); if(data.product) console.log("Product name:", data.product.product_name);
     document.getElementById('conn-result').innerHTML = data.status === 'ok'
       ? `<span style="color:var(--ok)">✓ ${data.message}</span>`
       : `<span style="color:var(--err)">Error: ${data.message}</span>`;
@@ -2405,6 +2408,7 @@ async function searchBuilderFood() {
     const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=6&fields=product_name,brands,nutriments`;
     const r = await fetch(url);
     const data = await r.json();
+    console.log("API Response:", data); console.log("Product:", data.product); if(data.product) console.log("Product name:", data.product.product_name);
     const products = (data.products||[]).filter(p => p.product_name && p.nutriments);
     if (!products.length) {
       el.innerHTML = '<div style="padding:10px;color:var(--txt3);font-size:12px">No results — try a different search</div>';
@@ -2588,6 +2592,7 @@ async function lookupPantryBarcode(barcode) {
   try {
     const r = await fetch(`https://corsproxy.io/?https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
     const data = await r.json();
+    console.log("API Response:", data); console.log("Product:", data.product); if(data.product) console.log("Product name:", data.product.product_name);
     if (data.status !== 1 || !data.product) {
       resultEl.innerHTML = '<div style="color:var(--warn);font-size:13px;padding:8px">Product not found — add manually.</div>';
       return;
@@ -2766,6 +2771,7 @@ async function loadTodayWorkout() {
   try {
     const r = await fetch(url + '?action=getTodayWorkout');
     const data = await r.json();
+    console.log("API Response:", data); console.log("Product:", data.product); if(data.product) console.log("Product name:", data.product.product_name);
     if (data.status === 'ok' && data.workout && data.workout.exercises) {
       renderWorkout(data.workout);
     } else {
