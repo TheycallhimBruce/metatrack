@@ -1493,7 +1493,7 @@ function stopScanner() {
 async function lookupBarcode(barcode) {
   document.getElementById('scan-result').innerHTML = `<div style="color:var(--txt2);font-size:13px;padding:8px">Looking up barcode ${barcode}...</div>`;
   try {
-    const r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const r = await fetch(`https://api.allorigins.win/raw?url=https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
     const data = await r.json();
     if (data.status !== 1 || !data.product) {
       document.getElementById('scan-result').innerHTML = `<div style="color:var(--warn);font-size:13px;padding:8px">Product not found in database. Try manual entry.</div>`;
@@ -2586,7 +2586,7 @@ async function lookupPantryBarcode(barcode) {
   const resultEl = document.getElementById('pantry-scan-result');
   resultEl.innerHTML = `<div style="color:var(--txt2);font-size:13px;padding:8px">Looking up ${barcode}...</div>`;
   try {
-    const r = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const r = await fetch(`https://api.allorigins.win/raw?url=https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
     const data = await r.json();
     if (data.status !== 1 || !data.product) {
       resultEl.innerHTML = '<div style="color:var(--warn);font-size:13px;padding:8px">Product not found — add manually.</div>';
